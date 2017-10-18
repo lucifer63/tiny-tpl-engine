@@ -1,0 +1,15 @@
+<paragraph version="1.0" id="paragraph_06">
+	
+	<page number="100"></page>
+	<text_block class="no_icon" padding_top="0" overlay_padding_top="0">
+		<p margin_top="0" align="center">
+			<image_block class="plashka">
+				<img url="Data\images\plashki\06.png">
+			</image_block>
+		</p>
+	</text_block>
+	<div id="lol">
+	2
+</div>
+
+</paragraph>
