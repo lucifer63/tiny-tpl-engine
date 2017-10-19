@@ -1,7 +1,6 @@
 {
   "name": "tiny-tpl-engine",
   "version": "1.0.3",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,9 +8,19 @@
   "author": "lucifer63",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
-    "grunt-prettify": "^0.4.0",
-    "jsdom": "^11.3.0"
-  }
+    "grunt-prettify": "^0.4.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucifer63/tiny-tpl-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lucifer63/tiny-tpl-engine/issues"
+  },
+  "homepage": "https://github.com/lucifer63/tiny-tpl-engine#readme",
+  "description": ""
 }

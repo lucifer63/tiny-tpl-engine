@@ -1,39 +1,47 @@
-const	jsdom	= require("jsdom"), 
-		fs		= require('fs'),
-		utils	= require('.//utils.js');
+const utils	= require('.//utils.js');
 
-const { JSDOM } = jsdom; 
+utils.fs		= require('fs');
+utils.cheerio	= require('cheerio');
+utils.templates	= {};
+utils.xml_trees	= {};
 
-var xml			= fs.readFileSync('test.xml', 'utf8'), 
-	dom			= new JSDOM( xml, { contentType: "text/xml" }),
-	document	= dom.window.document,
-	root		= dom.window.document.documentElement;
+if (process.argv.length < 3) {
+	throw new Error('Path to a folder containing .xml files must be passed!');
+}
 
-utils.document = document;
+const project_folder = process.argv[2];
 
-var templates = {}; 
+Promise.all([
+	new Promise(readTemplates),
+	new Promise(readAndProcessXMLFiles)
+])
+	.then(applyTemplates)
+	.then(saveFiles);
 
-utils.readFiles(__dirname + '\\templates\\', function(filename, content) { 
-	templates[ filename.split('.')[0] ] = content; 
-}, utils.throwErr, function() { 
-	var elements, transfer, attributes; 
+function readTemplates(resolve, reject) {
+	utils.readDir(project_folder + '\\Data\\templates\\', function(filename, content) { 
+		utils.templates[ filename.split('.')[0] ] = content; 
+	}, utils.throwErr, resolve);
+}
 
-	for (tag_name in templates) { 
-		elements = root.getElementsByTagName( tag_name ); 
+function readAndProcessXMLFiles(resolve, reject) {
+	utils.readDir(project_folder + '\\Data\\articles_raw\\', function(filename, content) {
+		utils.xml_trees[ filename.split('.')[0] ] = utils.cheerio.load( content, { xmlMode: true });
+	}, utils.throwErr, resolve);
+}
 
-		for (var i = elements.length; i--;) { 
-			transfer = utils.createElementFromString( templates[ tag_name ].replace('{content}', elements[i].innerHTML) ); 
-			attributes = elements[i].attributes; 
+function applyTemplates(resolve, reject) {
+	for (tree in utils.xml_trees) {
+		utils.applyTemplates( utils.xml_trees[ tree ] );
+	}
+}
 
-			for (var j = attributes.length - 1; j >= 0; j--) { 
-				transfer.setAttribute( attributes[j].name, attributes[j].value ); 
-			} 
+function saveFiles() {
+	for (tree in utils.xml_trees) {
+		utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
+	}
 
-			utils.replaceElement(elements[i], transfer)
-		} 
-	} 
-
-	fs.writeFile("dirty/test.xml", root.outerHTML , function(err) {
-	    console.log("The file was saved!");
-	});  
-});
+	utils.saveFiles(project_folder + '\\Data\\articles\\', utils.xml_trees, utils.throwErr, function() {
+		console.log('Done!')
+	})
+}

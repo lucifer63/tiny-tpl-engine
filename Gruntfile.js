@@ -15,10 +15,10 @@ module.exports = function(grunt) {
 			},
 			all: {
 				expand: true,
-				cwd: 'dirty/',
+				cwd: 'Data/articles',
 				ext: '.xml',
 				src: ['*.xml'],
-				dest: 'pretty/'
+				dest: 'Data/articles'
 			},
 		}
 	});
