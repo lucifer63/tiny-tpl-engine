@@ -2,6 +2,7 @@ const utils	= require('.//utils.js');
 
 utils.fs		= require('fs');
 utils.cheerio	= require('cheerio');
+utils.juice		= require('juice');
 utils.templates	= {};
 utils.xml_trees	= {};
 
@@ -11,12 +12,11 @@ if (process.argv.length < 3) {
 
 const project_folder = process.argv[2];
 
-Promise.all([
-	new Promise(readTemplates),
-	new Promise(readAndProcessXMLFiles)
+utils.ignite([
+	[ readTemplates, readAndProcessXMLFiles ],
+	applyTemplates,
+	saveFiles
 ])
-	.then(applyTemplates)
-	.then(saveFiles);
 
 function readTemplates(resolve, reject) {
 	utils.readDir(project_folder + '\\Data\\templates\\', function(filename, content) { 
@@ -34,14 +34,20 @@ function applyTemplates(resolve, reject) {
 	for (tree in utils.xml_trees) {
 		utils.applyTemplates( utils.xml_trees[ tree ] );
 	}
+	resolve();
 }
 
 function saveFiles() {
 	for (tree in utils.xml_trees) {
-		utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
+		//utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
+		utils.juice.inlineDocument( utils.xml_trees[tree], 'page { color: red; }');
+		console.log(utils.xml_trees[tree].html())
+
 	}
 
 	utils.saveFiles(project_folder + '\\Data\\articles\\', utils.xml_trees, utils.throwErr, function() {
 		console.log('Done!')
 	})
 }
+
+//	console.log( utils.juice.inlineDocument( utils.xml_trees[ 'test' ], 'div { color: red; }' ) );
