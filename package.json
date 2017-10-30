@@ -12,7 +12,8 @@
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-prettify": "^0.4.0",
-    "juice": "^4.2.0"
+    "juice": "^4.2.0",
+    "suggestions-jquery": "^17.10.0"
   },
   "devDependencies": {},
   "repository": {
