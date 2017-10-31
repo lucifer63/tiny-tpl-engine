@@ -1,3 +1,7 @@
+//	apply templates
+//		catch circular references
+//		recursively or excessively
+
 const utils	= require('.//utils.js');
 
 utils.fs		= require('fs');
@@ -39,10 +43,8 @@ function applyTemplates(resolve, reject) {
 
 function saveFiles() {
 	for (tree in utils.xml_trees) {
-		//utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
-		utils.juice.inlineDocument( utils.xml_trees[tree], 'page { color: red; }');
-		console.log(utils.xml_trees[tree].html())
-
+		//utils.juice.inlineDocument( utils.xml_trees[tree], );
+		utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
 	}
 
 	utils.saveFiles(project_folder + '\\Data\\articles\\', utils.xml_trees, utils.throwErr, function() {

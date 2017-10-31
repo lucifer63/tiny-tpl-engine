@@ -2,6 +2,12 @@ module.exports = {};
 
 self = module.exports;
 
+RegExp.empty_lines = /^\s*[\r\n]/gm;
+
+String.prototype.trim_empty_lines = function() {
+	return this.replace(RegExp.empty_lines, '');
+}
+
 Object.assign(self, {
 	throwErr: function(err) {
 		throw err;
@@ -87,7 +93,7 @@ Object.assign(self, {
 			elements = $( tag_name ); 
 
 			$( tag_name ).each(function(i, elem) {
-				transfer = $(self.templates[ tag_name ].replace('{content}', $(this).html()))
+				transfer = $( self.templates[ tag_name ].replace('{content}', $(this).html()).trim_empty_lines() )
 				$( this ).replaceWith( transfer )
 
 				attributes = $( this ).attr();
