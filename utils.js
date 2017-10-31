@@ -80,7 +80,7 @@ Object.assign(self, {
 		}); 
 	}, 
 	applyTemplates: function( $ ) {
-		// $ is actually an XML tree, named as $ 'cuz of identical functionality
+		// $ is actually an XML tree, named as $ 'cuz of identical (to jQuery) functionality
 		var elements, transfer, attributes; 
 
 		for (tag_name in self.templates) { 
