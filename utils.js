@@ -160,18 +160,19 @@ Object.assign(self, {
 	parseValue: function(input, node, counters, $) {
 		var input = self.parseSpaceSeparatedString(input),
 			current,
+			attr,
 			output = '';
 
 		for (var i = 0; i < input.length; i++) {
 			current = input[i];
 
 			if (current.indexOf('attr') !== -1) {
-				current = self.parseCSSFunctionStringAs( 'attr', current )
-				current = node.attr( current );
+				attr = self.parseCSSFunctionStringAs( 'attr', current )
+				current = node.attr( attr );
 				if (typeof current !== typeof undefined && current !== false) {
 					output += current;
 				} else {
-					console.log(`Warning: element ${ node.prop('tagName') } doesn't have ${ current } attribute!`);
+					console.log(`Warning: element "${ node.prop('tagName') }" doesn't have "${ attr }" attribute!`);
 				}
 			} else if (current.indexOf('counter') !== -1) {
 				current = self.parseCSSFunctionStringAs( 'counter', current )

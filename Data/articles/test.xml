@@ -1,4 +1,4 @@
-<paragraph version="1.0" id="paragraph_06" color="red" counter-reset="section, paragraph_color value(attr(color) ' + ' counter(section))">
+<paragraph version="1.0" id="paragraph_06" counter-reset="section, paragraph_color value(attr(color) ' + ' counter(section))">
 
 	<page number="100" />
 	<text_block class="no_icon" padding_top="0" overlay_padding_top="0">
@@ -13,6 +13,10 @@
 	</asdasd_res>
 
 	<div counter-increment="section" modify-attribute="test value(attribute counter(section)), test2 value(counter(paragraph_id))" modify-content="counter(paragraph_color) content" width="20px">asd</div>
+
+	<chapter class="test">
+		<div class="test" counter-increment="section" modify-attribute="test value(attribute counter(section)), test2 value(counter(paragraph_id))" modify-content="counter(paragraph_color) content" width="20px">asd</div>
+	</chapter>
 
 	<ol class="toc" counter-reset="toc">
 		<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Intro</li>
