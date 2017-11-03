@@ -7,6 +7,10 @@ Object.assign(RegExp, {
 	spaces:				/\s+/g
 })
 
+Array.prototype.last = function() {	
+	return this[this.length - 1];
+}
+
 String.prototype.trim_empty_lines = function() {
 	return this.replace(RegExp.empty_lines, '');
 }
@@ -134,25 +138,69 @@ Object.assign(self, {
 		return true;
 	},
 	parseSpaceSeparatedString: function(input) {
-		var str = '', arr = [], inside_quoted_region = false;
+		var str = '',
+			arr = [],
+			inside_quoted_region = false,
+			bracket_opened = false;
 
 		for (i = 0, l = input.length; i < l; i++) {
-			if (input[i] === '\'') {
-				if (inside_quoted_region) {
-					arr.push( str );
-				} else {
-					arr.push( str.trim() )
+			switch (input[i]) {
+				case '(': {
+					if (!inside_quoted_region) {
+						bracket_opened = true;
+					}
+					str += input[i];
+					break;
 				}
-				inside_quoted_region = !inside_quoted_region;
-				str = '';
-			} else {
-				str += input[i];
+				case ')': {
+					if (!inside_quoted_region) {
+						bracket_opened = false;
+					}
+					str += input[i];
+					break;
+				}
+				case '\'': {
+					if (bracket_opened) {
+						str += input[i];
+						break;
+					}
+					if (inside_quoted_region) {
+						if (str.length) {
+							arr.push( str );
+						}
+					} else {
+						if (str.length) {
+							arr.push( str.trim() );
+						}
+					}
+					inside_quoted_region = !inside_quoted_region;
+					str = '';
+					break;
+				}
+				case ' ': {
+					if (bracket_opened || inside_quoted_region) {
+						str += input[i];
+						break;
+					}
+					if (!inside_quoted_region && str.length) {
+						arr.push( str.trim() );
+						str = '';
+					}
+					break;
+				}
+				default: {
+					str += input[i];
+				}
 			}
 		}
 		if (inside_quoted_region) {
-			arr.push( str );
+			if (str.length) {
+				arr.push( str );
+			}
 		} else {
-			arr.push( str.trim() )
+			if (str.length) {
+				arr.push( str.trim() );
+			}
 		}
 
 		return arr;
@@ -161,6 +209,7 @@ Object.assign(self, {
 		var input = self.parseSpaceSeparatedString(input),
 			current,
 			attr,
+			initial = '',
 			output = '';
 
 		for (var i = 0; i < input.length; i++) {
@@ -174,9 +223,16 @@ Object.assign(self, {
 				} else {
 					console.log(`Warning: element "${ node.prop('tagName') }" doesn't have "${ attr }" attribute!`);
 				}
+			} else if (current === 'content') {
+				output += node.html();
 			} else if (current.indexOf('counter') !== -1) {
 				current = self.parseCSSFunctionStringAs( 'counter', current )
-				output += counters[current][ counters[current].length - 1 ];
+
+				if (!(counters[current] instanceof Array)) {
+					throw new Error(`Element "${node.prop('tagName')}" cannot find counter "${current}"!`);
+				}
+
+				output += counters[current].last();
 			} else {
 				output += current
 			}
@@ -193,7 +249,20 @@ Object.assign(self, {
 			throw new Error(`CSS value "${input}" is not a valid ${type}!`);
 		}
 	},
-	test: function( node, counters, $ ) {
+	replace(node, tag_name, $) {
+		var transfer = $("<" + tag_name + ">" + node.html() + "</" + tag_name + ">");
+
+		attributes = node.attr();
+
+		for (var key in attributes) {
+			transfer.attr(key, attributes[key]);
+		}
+
+		node.after( transfer ).remove();
+
+		return transfer;
+	},
+	resetCounters: function(node, counters, $) {
 		var counter_reset = node.attr('counter-reset'),
 			index_of_first_space = -1,
 			name,
@@ -223,11 +292,104 @@ Object.assign(self, {
 				}
 				counters[ name ].push( value );
 			}
-			console.log(node.prop('tagName'), counter_reset, counters)
+			node.removeAttr('counter-reset');
+		}
+	},
+	incrementCounters: function(node, counters, $) {
+		var counter_increment = node.attr('counter-increment'),
+			name;
+
+		if (counter_increment) {
+			counter_increment = counter_increment.split(',');
+
+			for (var i = 0; i < counter_increment.length; i++) {
+				name = counter_increment[i].trim();
+
+				if (typeof counters[ name ].last() === 'number') {
+					counters[ name ][ counters[ name ].length - 1 ]++;
+				}
+			}
+
+			node.removeAttr('counter-increment');
+		}
+	},
+	modifyAttributes: function(node, counters, $) {
+		var modify_attribute = node.attr('modify-attribute'),
+			index_of_first_space = -1,
+			name,
+			value;
+
+		if (node.prop('tagName') === 'IMG') {
+			console.log(node.attr('url'), modify_attribute)
 		}
 
+		if (modify_attribute) {
+			modify_attribute = modify_attribute.split(',');
+
+			for (var i = 0; i < modify_attribute.length; i++) {
+				modify_attribute[i] = modify_attribute[i].trim();
+				index_of_first_space = modify_attribute[i].indexOf(' ');
+
+				if (index_of_first_space === -1) {
+					throw new Error(`CSS value "${modify_attribute[i]}" is invalid: modify-attribute rule must consist of two parts!`);	
+				}
+
+				modify_attribute[i] = [ modify_attribute[i].substr(0, index_of_first_space), modify_attribute[i].substr(index_of_first_space + 1).trim() ];
+				
+				name = modify_attribute[i][0];
+
+				value = self.parseCSSFunctionStringAs( 'value', modify_attribute[i][1] );
+				value = value.replace('attribute', 'attr(' + name + ')');
+				value = self.parseValue( value, node, counters, $ );	
+
+				node.attr(name, value);
+			}
+			node.removeAttr('modify-attribute');
+		}
+	},
+	modifyContent: function(node, counters, $) {
+		var modify_content = node.attr('modify-content'),
+			name,
+			value;
+
+			if (modify_content) {
+				modify_content = modify_content.trim();
+				value = self.parseValue( modify_content, node, counters, $ );
+				node.html(value);
+				node.removeAttr('modify-content');
+			}
+
+	},
+	modifyTags: function(node, counters, $) {
+		var modify_tag = node.attr('modify-tag'),
+			name,
+			value;
+
+			if (modify_tag) {
+				value = modify_tag.trim();
+				value = value.replace('tag', '\'' + node.prop('tagName').toLowerCase() + '\'');
+				value = self.parseValue( value, node, counters, $ );
+				node = self.replace(node, value, $);
+				node.removeAttr('modify-tag');
+			}
+
+	},
+	applyCounters: function(node, counters, $) {
+		self.log(node.prop('tagName'))
+
+		self.resetCounters( node, counters, $ );
+		self.incrementCounters( node, counters, $ );
+		self.modifyAttributes( node, counters, $ );
+		self.modifyContent( node, counters, $ );
+		self.modifyTags( node, counters, $ );
+
+		//console.log(counters)
+
 		node.children().each(function(i, elem) {
-			self.test( $(elem), counters, $ );
+			self.applyCounters( $(elem), counters, $ );
 		})
 	}
 });
+
+
+

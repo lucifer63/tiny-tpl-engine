@@ -1,0 +1,12 @@
+chapter {
+	counter-reset: chapter_color value(attr(color)), icons;
+}
+
+table td:first-child img {
+	counter-increment: icons;
+	modify-attr: url value(attribute counter(chapter_color) "/", url value(attribute counter(icons) ".svg"));
+}
+
+h1 {
+	modify-tag: counter(chapter_color) "_" tag;
+}

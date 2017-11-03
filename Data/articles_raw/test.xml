@@ -1,5 +1,5 @@
-<paragraph version="1.0" id="paragraph_06">
-	
+<chapter version="1.0" id="chapter_01" color="violet">
+
 	<page number="100"/>
 	<text_block class="no_icon" padding_top="0" overlay_padding_top="0">
 		<p margin_top="0" align="center">
@@ -14,10 +14,6 @@
 
 	<div>asd</div>
 
-
-<chapter class="test">
-  <div class="test">asd</div>
-</chapter>
 
 <ol class="toc">
 	<li>Intro</li>
@@ -39,4 +35,70 @@
 </ol>
 
 
-	</paragraph>
+	<header hidden="true">Let's Go!</header>
+
+	<page number="4"/>
+	<p margin_bottom="4">
+		<h1>Let's Go!</h1>
+	</p>
+	<table width="100%" border-style="none">
+		<tr>
+			<td width="50px" text-valign="center">
+				<image_block width="32px">
+					<img url="Data/images/icons/"/>
+				</image_block>
+			</td>
+			<td width="50px" text-valign="center">
+				<image_block width="32px">
+					<img url="Data/images/icons/microphone.svg"/>
+				</image_block>
+			</td>
+			<td text-valign="center">Спой песенку</td>
+		</tr>
+	</table>
+	<image_block width="100%">
+		<img url="Data/images/4-1.png"/>
+	</image_block>
+	<table width="100%" border-style="none">
+		<tr>
+			<td width="50px">
+				<image_block width="32px">
+					<img url="Data/images/icons/"/>
+				</image_block>
+			</td>
+			<td>Поговори со своим одноклассником, используя образец.</td>
+		</tr>
+	</table>
+	<image_block width="100%">
+		<img url="Data/images/4-2.png"/>
+	</image_block>
+
+	<page number="5"/>
+	<table width="100%" border-style="none">
+		<tr>
+			<td width="50px">
+				<image_block width="32px">
+					<img url="Data/images/icons/"/>
+				</image_block>
+			</td>
+			<td><red>Hello</red> или <red>Goodbye</red>? Посмотри на картинки и скажи.</td>
+		</tr>
+	</table>
+	<image_block width="100%">
+		<img url="Data/images/5-1.png"/>
+	</image_block>
+	<table width="100%" border-style="none">
+		<tr>
+			<td width="50px">
+				<image_block width="32px">
+					<img url="Data/images/icons/"/>
+				</image_block>
+			</td>
+			<td>Поприветствуй одноклассников, как показано в образце.</td>
+		</tr>
+	</table>
+	<image_block width="100%">
+		<img url="Data/images/5-2.png"/>
+	</image_block>
+
+</chapter>

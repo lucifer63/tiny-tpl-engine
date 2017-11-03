@@ -11,7 +11,7 @@ utils.templates	= {};
 utils.xml_trees	= {};
 utils.style		= '';
 
-utils.debug = true;
+utils.debug = false;
 
 if (process.argv.length < 3) {
 	throw new Error('Path to a folder containing .xml files must be passed!');
@@ -80,7 +80,7 @@ function inlineStyles(resolve, reject) {
 function applyCounters(resolve, reject) {
 	utils.log('Starting to applyCounters.')
 	for (var tree in utils.xml_trees) {
-		utils.test( utils.xml_trees[tree].root(), {}, utils.xml_trees[tree] );
+		utils.applyCounters( utils.xml_trees[tree].root(), {}, utils.xml_trees[tree] );
 	}
 	utils.log('Finished procedure applyCounters.')
 	resolve();
