@@ -1,4 +1,4 @@
-<paragraph version="1.0" id="paragraph_06">
+<paragraph version="1.0" id="paragraph_06" color="red">
 	
 	<page number="100"/>
 	<text_block class="no_icon" padding_top="0" overlay_padding_top="0">
@@ -11,5 +11,32 @@
 	<asdasd>
 		<test asd="2">s</test>
 	</asdasd>
+
+	<div>asd</div>
+
+
+<chapter class="test">
+  <div class="test">asd</div>
+</chapter>
+
+<ol class="toc">
+	<li>Intro</li>
+	<li>Topic
+		<ol>
+			<li>Subtopic</li>
+			<li>Subtopic</li>
+			<li>Subtopic</li>
+		</ol>
+	</li>
+	<li>Topic
+		<ol>
+			<li>Subtopic</li>
+			<li>Subtopic</li>
+			<li>Subtopic</li>
+		</ol>
+	</li>
+	<li>Closing</li>		
+</ol>
+
 
 	</paragraph>

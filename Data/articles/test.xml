@@ -1,4 +1,4 @@
-<paragraph version="1.0" id="paragraph_06">
+<paragraph version="1.0" id="paragraph_06" color="red" counter-reset="section, paragraph_color value(attr(color) ' + ' counter(section))">
 
 	<page number="100" />
 	<text_block class="no_icon" padding_top="0" overlay_padding_top="0">
@@ -9,7 +9,28 @@
 		</p>
 	</text_block>
 	<asdasd_res>
-		<div id="lol" asd="2">s</div>
+		<div id="lol" asd="2" counter-increment="section" modify-attribute="test value(attribute counter(section)), test2 value(counter(paragraph_id))" modify-content="counter(paragraph_color) content" width="20px">s</div>
 	</asdasd_res>
+
+	<div counter-increment="section" modify-attribute="test value(attribute counter(section)), test2 value(counter(paragraph_id))" modify-content="counter(paragraph_color) content" width="20px">asd</div>
+
+	<ol class="toc" counter-reset="toc">
+		<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Intro</li>
+		<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Topic
+			<ol counter-reset="toc">
+				<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Subtopic</li>
+				<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Subtopic</li>
+				<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Subtopic</li>
+			</ol>
+		</li>
+		<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Topic
+			<ol counter-reset="toc">
+				<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Subtopic</li>
+				<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Subtopic</li>
+				<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Subtopic</li>
+			</ol>
+		</li>
+		<li counter-increment="toc" modify-content="'(Item ' counters(toc, '.') ') ' content">Closing</li>
+	</ol>
 
 </paragraph>
