@@ -1,46 +1,13 @@
 <chapter version="1.0" id="chapter_01" color="violet">
 
-	<page number="100"/>
-	<text_block class="no_icon" padding_top="0" overlay_padding_top="0">
-		<p margin_top="0" align="center">
-			<image_block class="plashka">
-				<img url="Data\images\plashki\06.png" />
-			</image_block>
-		</p>
-	</text_block>
-	<asdasd>
-		<test asd="2">s</test>
-	</asdasd>
-
-	<div>asd</div>
-
-
-<ol class="toc">
-	<li>Intro</li>
-	<li>Topic
-		<ol>
-			<li>Subtopic</li>
-			<li>Subtopic</li>
-			<li>Subtopic</li>
-		</ol>
-	</li>
-	<li>Topic
-		<ol>
-			<li>Subtopic</li>
-			<li>Subtopic</li>
-			<li>Subtopic</li>
-		</ol>
-	</li>
-	<li>Closing</li>		
-</ol>
-
-
-	<header hidden="true">Let's Go!</header>
 
 	<page number="4"/>
-	<p margin_bottom="4">
-		<h1>Let's Go!</h1>
-	</p>
+	<head>Let's Go!</head>
+	<task second-icon="microphone">Спой песенку</task>
+	<image url="4-1.png" />
+	<task icons="one">Поговори со своим одноклассником, используя образец.</task>
+	<image url="4-2.png" />
+	<!--
 	<table width="100%" border-style="none">
 		<tr>
 			<td width="50px" text-valign="center">
@@ -100,5 +67,6 @@
 	<image_block width="100%">
 		<img url="Data/images/5-2.png"/>
 	</image_block>
+	-->
 
 </chapter>

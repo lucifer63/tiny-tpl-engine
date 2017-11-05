@@ -1,0 +1,1 @@
+<image_block width="100%"><img /></image_block>

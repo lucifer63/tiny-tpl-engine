@@ -15,22 +15,22 @@
 	<div width="20px">asd</div>
 
 	<ol class="toc">
-		<li>Intro</li>
-		<li>Topic
+		<li>(Item 1) Intro</li>
+		<li>(Item 2) Topic
 			<ol>
-				<li>Subtopic</li>
-				<li>Subtopic</li>
-				<li>Subtopic</li>
+				<li>(Item 1) Subtopic</li>
+				<li>(Item 2) Subtopic</li>
+				<li>(Item 3) Subtopic</li>
 			</ol>
 		</li>
-		<li>Topic
+		<li>(Item 4) Topic
 			<ol>
-				<li>Subtopic</li>
-				<li>Subtopic</li>
-				<li>Subtopic</li>
+				<li>(Item 1) Subtopic</li>
+				<li>(Item 2) Subtopic</li>
+				<li>(Item 3) Subtopic</li>
 			</ol>
 		</li>
-		<li>Closing</li>
+		<li>(Item 4) Closing</li>
 	</ol>
 
 	<header hidden="true">Let's Go!</header>
@@ -43,7 +43,7 @@
 		<tr>
 			<td width="50px" text-valign="center">
 				<image_block width="32px">
-					<img url="Data/images/icons/" modify-attr="url value(attribute counter(chapter_color) '/', url value(attribute counter(icons) '.svg'))" />
+					<img url="Data/images/icons/violet/1.svg" />
 				</image_block>
 			</td>
 			<td width="50px" text-valign="center">
@@ -61,7 +61,7 @@
 		<tr>
 			<td width="50px">
 				<image_block width="32px">
-					<img url="Data/images/icons/" modify-attr="url value(attribute counter(chapter_color) '/', url value(attribute counter(icons) '.svg'))" />
+					<img url="Data/images/icons/violet/2.svg" />
 				</image_block>
 			</td>
 			<td>Поговори со своим одноклассником, используя образец.</td>
@@ -76,7 +76,7 @@
 		<tr>
 			<td width="50px">
 				<image_block width="32px">
-					<img url="Data/images/icons/" modify-attr="url value(attribute counter(chapter_color) '/', url value(attribute counter(icons) '.svg'))" />
+					<img url="Data/images/icons/violet/3.svg" />
 				</image_block>
 			</td>
 			<td><red>Hello</red> или <red>Goodbye</red>? Посмотри на картинки и скажи.</td>
@@ -89,7 +89,7 @@
 		<tr>
 			<td width="50px">
 				<image_block width="32px">
-					<img url="Data/images/icons/" modify-attr="url value(attribute counter(chapter_color) '/', url value(attribute counter(icons) '.svg'))" />
+					<img url="Data/images/icons/violet/4.svg" />
 				</image_block>
 			</td>
 			<td>Поприветствуй одноклассников, как показано в образце.</td>

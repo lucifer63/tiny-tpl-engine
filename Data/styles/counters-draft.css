@@ -4,9 +4,18 @@ chapter {
 
 table td:first-child img {
 	counter-increment: icons;
-	modify-attr: url value(attribute counter(chapter_color) "/", url value(attribute counter(icons) ".svg"));
+	modify-attribute: url value(attr counter(chapter_color) "/"), url value(attr counter(icons) ".svg");
 }
 
 h1 {
 	modify-tag: counter(chapter_color) "_" tag;
+}
+
+chapter > image_block {
+	counter-reset: image_url value(attr(url));
+	remove-attribute: url;
+}
+
+chapter > image_block > img {
+	modify-attribute: url value("Data/images/" counter(image_url));
 }

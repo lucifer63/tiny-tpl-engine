@@ -1,12 +1,3 @@
-/*
-chapter {
-	counter-reset: section, paragraph_color value(attr(color) " + " counter(section));
-}
-div {
-	counter-increment: section;
-	modify-attribute: test value(attribute counter(section)), test2 value(counter(section));
-	modify-content: counter(paragraph_color) content;
-}
 
 
 ol.toc, ol.toc ol {
@@ -18,7 +9,7 @@ ol li {
 .toc li {
 	modify-content: "(Item " counter(toc) ") " content;
 }
-*/
+
 
 /* visible page "output"
 

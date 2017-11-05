@@ -4,7 +4,9 @@ self = module.exports;
 
 Object.assign(RegExp, {
 	empty_lines:		/^\s*[\r\n]/gm,
-	spaces:				/\s+/g
+	spaces:				/\s+/g,
+	content_marker:		/{content}/g,
+	single_attr:		/attr(?!\()/g
 })
 
 Array.prototype.last = function() {	
@@ -107,7 +109,7 @@ Object.assign(self, {
 			elements = $( tag_name ); 
 
 			$( tag_name ).each(function(i, elem) {
-				transfer = $( self.templates[ tag_name ].replace('{content}', $(this).html()).trim_empty_lines() )
+				transfer = $( self.templates[ tag_name ].replace(RegExp.content_marker, $(this).html()).trim_empty_lines() )
 				$( this ).replaceWith( transfer )
 
 				attributes = $( this ).attr();
@@ -319,10 +321,6 @@ Object.assign(self, {
 			name,
 			value;
 
-		if (node.prop('tagName') === 'IMG') {
-			console.log(node.attr('url'), modify_attribute)
-		}
-
 		if (modify_attribute) {
 			modify_attribute = modify_attribute.split(',');
 
@@ -339,8 +337,8 @@ Object.assign(self, {
 				name = modify_attribute[i][0];
 
 				value = self.parseCSSFunctionStringAs( 'value', modify_attribute[i][1] );
-				value = value.replace('attribute', 'attr(' + name + ')');
-				value = self.parseValue( value, node, counters, $ );	
+				value = value.replace(RegExp.single_attr, '\'' + node.attr(name) + '\'');
+				value = self.parseValue( value, node, counters, $ );
 
 				node.attr(name, value);
 			}
@@ -352,27 +350,40 @@ Object.assign(self, {
 			name,
 			value;
 
-			if (modify_content) {
-				modify_content = modify_content.trim();
-				value = self.parseValue( modify_content, node, counters, $ );
-				node.html(value);
-				node.removeAttr('modify-content');
-			}
-
+		if (modify_content) {
+			modify_content = modify_content.trim();
+			value = self.parseValue( modify_content, node, counters, $ );
+			node.html(value);
+			node.removeAttr('modify-content');
+		}
 	},
 	modifyTags: function(node, counters, $) {
 		var modify_tag = node.attr('modify-tag'),
 			name,
 			value;
 
-			if (modify_tag) {
-				value = modify_tag.trim();
-				value = value.replace('tag', '\'' + node.prop('tagName').toLowerCase() + '\'');
-				value = self.parseValue( value, node, counters, $ );
-				node = self.replace(node, value, $);
-				node.removeAttr('modify-tag');
-			}
+		if (modify_tag) {
+			value = modify_tag.trim();
+			value = value.replace('tag', '\'' + node.prop('tagName').toLowerCase() + '\'');
+			value = self.parseValue( value, node, counters, $ );
+			node = self.replace(node, value, $);
+			node.removeAttr('modify-tag');
+		}
+	},
+	removeAttributes: function(node, counters, $) {
+		var modify_attribute = node.attr('remove-attribute'),
+			name,
+			value;
 
+		if (modify_attribute) {
+			modify_attribute = modify_attribute.split(',');
+
+			for (var i = 0; i < modify_attribute.length; i++) {
+				node.removeAttr( modify_attribute[i].trim() )
+			}
+			
+			node.removeAttr('remove-attribute');
+		}
 	},
 	applyCounters: function(node, counters, $) {
 		self.log(node.prop('tagName'))
@@ -382,6 +393,7 @@ Object.assign(self, {
 		self.modifyAttributes( node, counters, $ );
 		self.modifyContent( node, counters, $ );
 		self.modifyTags( node, counters, $ );
+		self.removeAttributes( node, counters, $ );
 
 		//console.log(counters)
 

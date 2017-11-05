@@ -4,6 +4,8 @@ module.exports = function(grunt) {
 		extract_texttags	= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi');
 		inline_elements		= JSON.parse(extract_texttags.exec(config)[1]);
 
+		inline_elements.push("img");
+
 	grunt.initConfig({
 		prettify: {
 			options: {
