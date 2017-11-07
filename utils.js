@@ -271,6 +271,7 @@ Object.assign(self, {
 			value;
 
 		if (counter_reset) {
+
 			counter_reset = counter_reset.split(',');
 			for (var i = 0; i < counter_reset.length; i++) {
 				counter_reset[i] = counter_reset[i].trim();
@@ -299,6 +300,45 @@ Object.assign(self, {
 	},
 	incrementCounters: function(node, counters, $) {
 		var counter_increment = node.attr('counter-increment'),
+			index_of_first_space = -1,
+			name,
+			value;
+
+		if (counter_increment) {
+			counter_increment = counter_increment.split(',');
+			for (var i = 0; i < counter_increment.length; i++) {
+				counter_increment[i] = counter_increment[i].trim();
+				index_of_first_space = counter_increment[i].indexOf(' ');
+
+				if (index_of_first_space !== -1) {
+					counter_increment[i] = [ counter_increment[i].substr(0, index_of_first_space), counter_increment[i].substr(index_of_first_space + 1).trim() ];
+				}
+				
+				if (typeof counter_increment[i] === 'string') {
+					name = counter_increment[i];
+					value = 0;
+				} else {
+					name = counter_increment[i][0];
+					value = self.parseCSSFunctionStringAs( 'value', counter_increment[i][1] );
+					value = self.parseValue( value, node, counters, $ );
+				}
+
+				if (!(counters[ name ] instanceof Array)) {
+					//counters[ name ] = [];
+					throw new Error(`Element "${node.prop('tagName')}" cannot increment counter "${name}" because the counter doesn't exist!`);
+				}
+
+				if (value === 0) {
+					counters[ name ][ counters[ name ].length - 1 ]++;
+				} else {
+					counters[ name ][ counters[ name ].length - 1 ] = value;
+				}
+			}
+			node.removeAttr('counter-increment');
+		}
+
+		/*
+		var counter_increment = node.attr('counter-increment'),
 			name;
 
 		if (counter_increment) {
@@ -314,6 +354,7 @@ Object.assign(self, {
 
 			node.removeAttr('counter-increment');
 		}
+		*/
 	},
 	modifyAttributes: function(node, counters, $) {
 		var modify_attribute = node.attr('modify-attribute'),
@@ -385,7 +426,30 @@ Object.assign(self, {
 			node.removeAttr('remove-attribute');
 		}
 	},
-	applyCounters: function(node, counters, $) {
+	applyCounters: function($nodes, counters, $) {
+		
+		var children = [];
+
+		$nodes.each(function(i, node) {
+			var node = $( node );
+
+			self.resetCounters( node, counters, $ );
+			self.incrementCounters( node, counters, $ );
+			self.modifyAttributes( node, counters, $ );
+			self.modifyContent( node, counters, $ );
+			self.modifyTags( node, counters, $ );
+			self.removeAttributes( node, counters, $ );
+
+			children = children.concat( node.children().toArray() );
+
+			self.log( node.prop('tagName'), children.length )
+		})
+
+		if (children.length) {
+			self.applyCounters( $( children ), counters, $ )
+		}
+
+		/*
 		self.log(node.prop('tagName'))
 
 		self.resetCounters( node, counters, $ );
@@ -400,6 +464,7 @@ Object.assign(self, {
 		node.children().each(function(i, elem) {
 			self.applyCounters( $(elem), counters, $ );
 		})
+		*/
 	}
 });
 

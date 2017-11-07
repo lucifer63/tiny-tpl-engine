@@ -1,10 +1,16 @@
 chapter {
-	counter-reset: chapter_color value(attr(color)), icons;
+	counter-reset: chapter_color value(attr(color)), icons, current_icon, image_url;
 }
 
 table td:first-child img {
 	counter-increment: icons;
 	modify-attribute: url value(attr counter(chapter_color) "/"), url value(attr counter(icons) ".svg");
+}
+table[icon] {
+	counter-increment: current_icon value(attr(icon));
+}
+table[icon] td:nth-child(2) img {
+	modify-attribute: url value(attr counter(current_icon) ".svg");
 }
 
 h1 {
@@ -12,10 +18,22 @@ h1 {
 }
 
 chapter > image_block {
-	counter-reset: image_url value(attr(url));
+	counter-increment: image_url value(attr(url));
 	remove-attribute: url;
 }
 
 chapter > image_block > img {
-	modify-attribute: url value("Data/images/" counter(image_url));
+	modify-attribute: url value(attr counter(image_url));
+}
+
+
+
+ol {
+	counter-reset: toc;
+}
+ol li {
+	counter-increment: toc;
+}
+li {
+	modify-content: "(Item " counter(toc) ") " content;
 }

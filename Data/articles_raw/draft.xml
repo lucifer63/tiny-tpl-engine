@@ -3,10 +3,40 @@
 
 	<page number="4"/>
 	<head>Let's Go!</head>
-	<task second-icon="microphone">Спой песенку</task>
+	<task_with_icon icon="microphone">Спой песенку</task_with_icon>
 	<image url="4-1.png" />
-	<task icons="one">Поговори со своим одноклассником, используя образец.</task>
+	<task>Поговори со своим одноклассником, используя образец.</task>
 	<image url="4-2.png" />
+
+
+	<ol>
+	  <li>item</li>          <!-- 1     -->
+	  <li>item               <!-- 2     -->
+	    <ol>
+	      <li>item</li>      <!-- 2.1   -->
+	      <li>item</li>      <!-- 2.2   -->
+	      <li>item           <!-- 2.3   -->
+	        <ol>
+	          <li>item</li>  <!-- 2.3.1 -->
+	          <li>item</li>  <!-- 2.3.2 -->
+	        </ol>
+	        <ol>
+	          <li>item</li>  <!-- 2.3.1 -->
+	          <li>item</li>  <!-- 2.3.2 -->
+	          <li>item</li>  <!-- 2.3.3 -->
+	        </ol>
+	      </li>
+	      <li>item</li>      <!-- 2.4   -->
+	    </ol>
+	  </li>
+	  <li>item</li>          <!-- 3     -->
+	  <li>item</li>          <!-- 4     -->
+	</ol>
+	<ol>
+	  <li>item</li>          <!-- 1     -->
+	  <li>item</li>          <!-- 2     -->
+	</ol>
+
 	<!--
 	<table width="100%" border-style="none">
 		<tr>

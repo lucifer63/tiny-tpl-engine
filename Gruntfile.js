@@ -1,10 +1,15 @@
 module.exports = function(grunt) {
 
+	/*
 	var config				= grunt.file.read('Data/configs/config.cfg'),
 		extract_texttags	= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi');
-		inline_elements		= JSON.parse(extract_texttags.exec(config)[1]);
+	*/
 
-		inline_elements.push("img");
+	var inline_elements		= [];
+
+	//inline_elements = JSON.parse(extract_texttags.exec(config)[1]);
+
+	inline_elements.push("img");
 
 	grunt.initConfig({
 		prettify: {

@@ -1,1 +1,1 @@
-<image_block width="100%"><img /></image_block>
+<image_block width="100%"><img url="Data/images/"/></image_block>
