@@ -3,7 +3,7 @@
 <table>
 	<tr>
 		<td><image_block><img url="icon.png" /></image_block></td>
-		<if condition="attr(icon) === task">
+		<if condition="$( this ).attr('icon') == 'icon'">
 			<td><image_block><img url="some-other-icon.png" /></image_block></td>
 		</if>
 		<td>{content}</td>
@@ -11,15 +11,6 @@
 </table>
 
 
-<table>
-	<tr>
-		<td><image_block><img url="icon.png" /></image_block></td>
-		<if condition="this.hasClass(a)">
-			<td><image_block><img url="some-other-icon.png" /></image_block></td>
-		</if>
-		<td>{content}</td>
-	</tr>
-</table>
 
 <table width="100%" border-style="none">
 	<tr attribute="icon" must_include="yule">
