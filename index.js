@@ -1,6 +1,8 @@
-//	apply templates
-//		catch circular references
-//		recursively or excessively
+// + 1. Excessive/recursive template application, 
+// + 2. Template logic, same step as of #1?
+// 3. Fix counters.
+
+'use strict';
 
 const utils	= require('.//utils.js');
 
@@ -49,7 +51,7 @@ function readAndProcessXMLFiles(resolve, reject) {
 
 function readStyles(resolve, reject) {
 	utils.log('Starting to readStyles.')
-	utils.readDir(project_folder + '\\Data\\styles\\', function(filename, content) { 
+	utils.readDir(project_folder + '\\Data\\styles\\', function(filename, content) {
 		utils.style += '\n' + content;
 	}, utils.throwErr, function() {
 		utils.log('Finished procedure readStyles.')

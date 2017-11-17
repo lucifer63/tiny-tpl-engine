@@ -1,6 +1,8 @@
+'use strict';
+
 module.exports = {};
 
-self = module.exports;
+var self = module.exports;
 
 Object.assign(RegExp, {
 	empty_lines:		/^\s*[\r\n]/gm,
@@ -61,6 +63,9 @@ Object.assign(self, {
 			end_of_the_wick = end_of_the_wick.then(f);
 		}
 	},
+	evalCondition: function(condition) {
+		return condition ? eval( condition ) : true;
+	},
 	saveFiles: function(dirname, file_object, onError, callback) {
 		var files_amount = Object.keys(file_object).length,
 			processed = 0;
@@ -78,7 +83,7 @@ Object.assign(self, {
 			});
 		}
 	},
-	readDir: function(dirname, onFileContent, onError, callback) { 
+	readDir: function(dirname, onFileContent, onError, callback, important) { 
 		var processed = 0;
 
 		self.fs.readdir(dirname, function(err, filenames) { 
@@ -86,39 +91,88 @@ Object.assign(self, {
 				onError(err); 
 				return; 
 			} 
-			filenames.forEach(function(filename, i) { 
-				self.fs.readFile(dirname + filename, 'utf-8', function(err, content) { 
-					if (err) { 
-						onError(err); 
-						return; 
-					} 
-					onFileContent(filename, content); 
-					processed++;
-					if (filenames.length === processed) {
-						callback(); 
-					} 
+			if (!filenames.length) {
+				if (important) {
+					onError( new Error(`Directory ${ dirname } is empty!`) );	
+				} else {
+					self.log(`Directory ${ dirname } is empty!`);
+				}
+				callback()
+			} else {
+				filenames.forEach(function(filename, i) { 
+					self.fs.readFile(dirname + filename, 'utf-8', function(err, content) { 
+						if (err) { 
+							onError(err); 
+							return; 
+						} 
+						onFileContent(filename, content); 
+						processed++;
+						if (filenames.length === processed) {
+							callback(); 
+						} 
+					}); 
 				}); 
-			}); 
+			}
 		}); 
 	},
 	applyTemplates: function( $ ) {
 		// $ is actually an XML tree, named as $ 'cuz of identical (to jQuery) functionality
-		var elements, transfer, attributes; 
+		var $elements, $transfer, attributes, unprocessed_elements_exist = true;
 
-		for (var tag_name in self.templates) { 
-			elements = $( tag_name ); 
+		while (unprocessed_elements_exist) {
+			unprocessed_elements_exist = false;
 
-			$( tag_name ).each(function(i, elem) {
-				transfer = $( self.templates[ tag_name ].replace(RegExp.content_marker, $(this).html()).trim_empty_lines() )
-				$( this ).replaceWith( transfer )
+			for (var tag_name in self.templates) { 
+				$elements = $( tag_name ); 
 
-				attributes = $( this ).attr();
-
-				for (var key in attributes) {
-					transfer.attr(key, attributes[key]);
+				if ($elements.length) {
+					unprocessed_elements_exist = true;
 				}
-			});
-		} 
+
+				$elements.each(function(i, elem) {
+					var $initial_element = $( elem );
+
+					$transfer = $( self.templates[ tag_name ].replace(RegExp.content_marker, $(this).html()).trim_empty_lines() )
+					$initial_element.replaceWith( $transfer )
+
+					attributes = $( this ).attr();
+
+					for (var key in attributes) {
+						$transfer.attr(key, attributes[key]);
+					}
+
+					$transfer.find('if').each(function(i, elem) {
+						var $if = $( elem ), 
+							condition = $if.attr('condition');
+
+						try {
+							if (self.evalCondition.call($initial_element, condition)) {
+								$if.replaceWith( $if.html() );
+							} else {
+								$if.remove();
+							}
+						} catch (e) {
+							self.throwErr( new Error(`An error occured during processing of condition "${ condition }" of "IF" element inside "${ $initial_element.prop('tagName') }" element: ${ e.message }`) );
+						}
+					})
+
+					$transfer.find('[condition]').each(function(i, elem) {
+						var $this = $( elem ), 
+							condition = $this.attr('condition');
+
+						try {
+							if (self.evalCondition.call($initial_element, condition)) {
+								$this.removeAttr('condition');
+							} else {
+								$this.remove();
+							}
+						} catch (e) {
+							self.throwErr( new Error(`An error occured during processing of condition "${ condition }" of "${ $this.prop('tagName') }" element inside "${ $initial_element.prop('tagName') }" element: ${ e.message }`) );
+						}
+					})
+				});
+			} 
+		}
 	},
 	styleToAttributes: function( $ ) {
 		$( '[style]' ).each(function(i, elem) {
@@ -260,7 +314,7 @@ Object.assign(self, {
 			transfer.attr(key, attributes[key]);
 		}
 
-		node.after( transfer ).remove();
+		node.replaceWith( transfer );
 
 		return transfer;
 	},
@@ -269,6 +323,8 @@ Object.assign(self, {
 			index_of_first_space = -1,
 			name,
 			value;
+
+		console.log(node.prop('tagName'), counter_reset)
 
 		if (counter_reset) {
 
@@ -427,8 +483,7 @@ Object.assign(self, {
 		}
 	},
 	applyCounters: function($nodes, counters, $) {
-		
-		var children = [];
+		var $children = $();
 
 		$nodes.each(function(i, node) {
 			var node = $( node );
@@ -440,13 +495,11 @@ Object.assign(self, {
 			self.modifyTags( node, counters, $ );
 			self.removeAttributes( node, counters, $ );
 
-			children = children.concat( node.children().toArray() );
-
-			self.log( node.prop('tagName'), children.length )
+			$children = $children.add( node.children() )
 		})
 
-		if (children.length) {
-			self.applyCounters( $( children ), counters, $ )
+		if ($children.length) {
+			self.applyCounters( $children, counters, $ )
 		}
 
 		/*

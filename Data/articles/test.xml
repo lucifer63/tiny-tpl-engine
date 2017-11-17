@@ -1,0 +1,23 @@
+<chapter version="1.0" id="chapter_01" color="violet" counter-reset="chapter_color value(attr(color)), icons, current_icon, image_url">
+
+	<table width="100%" border-style="none">
+		<tr>
+			<td width="50px">
+				<image_block width="32px"> <img url="Data/images/icons/" counter-increment="icons" modify-attribute="url value(attr counter(chapter_color) '/'), url value(attr counter(icons) '.svg')" /> </image_block>
+			</td>
+			<td>Поговори со своим одноклассником, используя образец.</td>
+		</tr>
+	</table>
+	<table width="100%" border-style="none" icon="test" counter-increment="current_icon value(attr(icon))">
+		<tr>
+			<td width="50px">
+				<image_block width="32px"> <img url="Data/images/icons/" counter-increment="icons" modify-attribute="url value(attr counter(chapter_color) '/'), url value(attr counter(icons) '.svg')" /> </image_block>
+			</td>
+			<td width="50px" text-valign="center">
+				<image_block width="32px"> <img url="Data/images/icons/" modify-attribute="url value(attr counter(current_icon) '.svg')" /> </image_block>
+			</td>
+			<td>Или не поговори</td>
+		</tr>
+	</table>
+
+</chapter>
