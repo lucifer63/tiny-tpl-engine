@@ -1,9 +1,0 @@
-#main-ul,
-#random-list-item
-{
-	counter-reset: x;
-}
-li {
-	counter-increment: x;
-	modify-content: counter(x) content;
-}

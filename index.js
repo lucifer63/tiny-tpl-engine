@@ -13,7 +13,7 @@ utils.templates	= {};
 utils.xml_trees	= {};
 utils.style		= '';
 
-utils.debug = true;
+utils.debug = false;
 
 if (process.argv.length < 3) {
 	throw new Error('Path to a folder containing .xml files must be passed!');
@@ -68,10 +68,6 @@ function applyTemplates(resolve, reject) {
 	utils.log('Finished procedure applyTemplates.')
 	resolve();
 }
-
-
-
-//$(destination).data( $(source).data() );
 
 function inlineStyles(resolve, reject) {
 	utils.log('Starting to inlineStyles.')

@@ -265,7 +265,10 @@ Object.assign(self, {
 			current,
 			attr,
 			initial = '',
-			output = '';
+			output = '',
+			counter,
+			lvl = node.data('lvl'),
+			index;
 
 		for (var i = 0; i < input.length; i++) {
 			current = input[i];
@@ -283,11 +286,25 @@ Object.assign(self, {
 			} else if (current.indexOf('counter') !== -1) {
 				current = self.parseCSSFunctionStringAs( 'counter', current )
 
-				if (!(counters[current] instanceof Array)) {
+				/* processing counter s */
+				index = lvl;
+
+				if (!(current in counters)) {
 					throw new Error(`Element "${node.prop('tagName')}" cannot find counter "${current}"!`);
 				}
 
-				output += counters[current].last();
+				counter = counters[current];
+
+				while (true) {
+					if (counter[ index ]) {
+						break;
+					} else {
+						index--;
+					}	
+				}
+
+				output += counter[index].last();
+				/* processing counter f */
 			} else {
 				output += current
 			}
@@ -322,7 +339,8 @@ Object.assign(self, {
 		var counter_reset = node.attr('counter-reset'),
 			index_of_first_space = -1,
 			name,
-			value;
+			value,
+			lvl = node.data('lvl');
 
 		if (counter_reset) {
 
@@ -344,10 +362,17 @@ Object.assign(self, {
 					value = self.parseValue( value, node, counters, $ );	
 				}
 
-				if (!(counters[ name ] instanceof Array)) {
-					counters[ name ] = []
+				/* processing counter s */
+				if (!(name in counters)) {
+					counters[ name ] = [];
 				}
-				counters[ name ].push( value );
+
+				if (!counters[ name ][ lvl ]) {
+					counters[ name ][ lvl ] = [];
+				}
+
+				counters[ name ][ lvl ].push( value );
+				/* processing counter f */
 			}
 			node.removeAttr('counter-reset');
 		}
@@ -356,7 +381,10 @@ Object.assign(self, {
 		var counter_increment = node.attr('counter-increment'),
 			index_of_first_space = -1,
 			name,
-			value;
+			value,
+			counter,
+			lvl = node.data('lvl'),
+			index;
 
 		if (counter_increment) {
 			counter_increment = counter_increment.split(',');
@@ -377,16 +405,29 @@ Object.assign(self, {
 					value = self.parseValue( value, node, counters, $ );
 				}
 
-				if (!(counters[ name ] instanceof Array)) {
-					//counters[ name ] = [];
+				/* processing counter s */
+				index = lvl;
+
+				if (!(name in counters)) {
 					throw new Error(`Element "${node.prop('tagName')}" cannot increment counter "${name}" because the counter doesn't exist!`);
 				}
 
-				if (value === 0) {
-					counters[ name ][ counters[ name ].length - 1 ]++;
-				} else {
-					counters[ name ][ counters[ name ].length - 1 ] = value;
+				counter = counters[name];
+
+				while (true) {
+					if (counter[ index ]) {
+						break;
+					} else {
+						index--;
+					}	
 				}
+
+				if (value === 0) {
+					counter[index][ counter[index].length - 1 ]++;
+				} else {
+					counter[index][ counter[index].length - 1 ] = value;
+				}
+				/* processing counter f */
 			}
 			node.removeAttr('counter-increment');
 		}
@@ -426,7 +467,6 @@ Object.assign(self, {
 			name,
 			value;
 
-
 		if (modify_content) {
 			modify_content = modify_content.trim();
 
@@ -440,7 +480,6 @@ Object.assign(self, {
 		var modify_tag = node.attr('modify-tag'),
 			name,
 			value;
-
 
 		if (modify_tag) {
 			value = modify_tag.trim();
@@ -467,35 +506,7 @@ Object.assign(self, {
 			node.removeAttr('remove-attribute');
 		}
 	},
-	//applyCounters: function($nodes, counters, $) {
 	applyCounters: function($node, counters, $, lvl) {
-		/*
-		var $children = $();
-
-		$nodes.each(function(i, node) {
-			var node = $( node );
-
-			self.log(node.prop('tagName'), node.attr());
-			self.log('cyan', '\tresetCounters');
-			self.resetCounters( node, counters, $ );
-			self.log('cyan', '\tincrementCounters');
-			self.incrementCounters( node, counters, $ );
-			self.log('cyan', '\tmodifyAttributes');
-			self.modifyAttributes( node, counters, $ );
-			self.log('cyan', '\tmodifyContent');
-			self.modifyContent( node, counters, $ );
-			self.log('cyan', '\tmodifyTag');
-			self.modifyTag( node, counters, $ );
-			self.log('cyan', '\tremoveAttributes');
-			self.removeAttributes( node, counters, $ );
-
-			$children = $children.add( node.children() )
-		})
-
-		if ($children.length) {
-			self.applyCounters( $children, counters, $ )
-		}*/
-
 		if (!lvl) {
 			lvl = 0;
 		}
@@ -504,12 +515,17 @@ Object.assign(self, {
 
 		self.log('green', `applying to "${ $node.prop('tagName') }", lvl=${ lvl }`);
 
-		self.resetCounters( $node, counters, $ );
-		self.incrementCounters( $node, counters, $ );
-		self.modifyAttributes( $node, counters, $ );
-		self.modifyContent( $node, counters, $ );
-		$node = self.modifyTag( $node, counters, $ );
-		self.removeAttributes( $node, counters, $ );
+		try {
+			self.resetCounters( $node, counters, $ );
+			self.incrementCounters( $node, counters, $ );
+			self.modifyAttributes( $node, counters, $ );
+			self.modifyContent( $node, counters, $ );
+			$node = self.modifyTag( $node, counters, $ );
+			self.removeAttributes( $node, counters, $ );
+		} catch (e) {
+			self.log('red', $node.html());
+			throw e;
+		}
 
 		$node.children().each(function(i, elem) {
 			self.applyCounters( $(elem), counters, $, lvl + 1 );

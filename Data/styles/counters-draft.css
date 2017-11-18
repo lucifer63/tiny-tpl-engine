@@ -1,5 +1,13 @@
 chapter {
-	counter-reset: chapter_color value(attr(color)), icons, current_icon, image_url;
+	counter-reset: chapter_color value(attr(color)), icons, current_icon, page value(attr(first-page));
+}
+
+page {
+	counter-reset: image;
+	modify-attribute: number value(counter(page));
+}
+page:not(:first-child) {
+	counter-increment: page;
 }
 
 table td:first-child img {
@@ -17,23 +25,7 @@ h1 {
 	modify-tag: counter(chapter_color) "_" tag;
 }
 
-chapter > image_block {
-	counter-increment: image_url value(attr(url));
-	remove-attribute: url;
-}
-
 chapter > image_block > img {
-	modify-attribute: url value(attr counter(image_url));
-}
-
-
-
-ol {
-	counter-reset: toc;
-}
-ol li {
-	counter-increment: toc;
-}
-li {
-	modify-content: "(Item " counter(toc) ") " content;
+	counter-increment: image;
+	modify-attribute: url value(attr counter(page) '-' counter(image) '.png');
 }
