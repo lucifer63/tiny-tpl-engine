@@ -23,13 +23,44 @@ Object.assign(self, {
 	throwErr: function(err) {
 		throw err;
 	},
-	log: function() {
-		if (this.debug) {
-			console.log.apply(null, Array.prototype.slice.call(arguments));
-			return true;
+	log: (function() {
+		var styles = {
+			reset: 0,
+			bright: 1,
+			dim: 2,
+			underscore: 4,
+			blink: 5,
+			reverse: 7,
+			hidden: 8,
+			fgblack: 30,	black: 30,
+			fgred: 31,		red: 31,
+			fggreen: 32,	green: 32,
+			fgyellow: 33,	yellow: 33,
+			fgblue: 34,		blue: 34,
+			fgmagenta: 35,	magenta: 35,
+			fgcyan: 36,		cyan: 36,
+			fgwhite: 37,	white: 37,
+			bgblack: 40,
+			bgred: 41,
+			bggreen: 42,
+			bgyellow: 43,
+			bgblue: 44,
+			bgmagenta: 45,
+			bgcyan: 46,
+			bgwhite: 47
 		}
-		return false;
-	},
+
+		return function() {
+			if (this.debug) {
+				if (arguments[0] in styles) {
+					arguments[0] = '\x1b[' + styles[arguments[0]] + 'm%s\x1b[0m';
+				}
+				console.log.apply(null, Array.prototype.slice.call(arguments));
+				return true;
+			}
+			return false;
+		}
+	})(),
 	ignite: function( fuse ) {
 		var end_of_the_wick, f;
 
@@ -193,74 +224,46 @@ Object.assign(self, {
 		}
 		return true;
 	},
-	parseSpaceSeparatedString: function(input) {
-		var str = '',
-			arr = [],
-			inside_quoted_region = false,
-			bracket_opened = false;
+	parseSpaceSeparatedString: (function() {
+		var str, arr;
 
-		for (i = 0, l = input.length; i < l; i++) {
-			switch (input[i]) {
-				case '(': {
-					if (!inside_quoted_region) {
-						bracket_opened = true;
-					}
-					str += input[i];
-					break;
-				}
-				case ')': {
-					if (!inside_quoted_region) {
-						bracket_opened = false;
-					}
-					str += input[i];
-					break;
-				}
-				case '\'': {
-					if (bracket_opened) {
-						str += input[i];
-						break;
-					}
-					if (inside_quoted_region) {
-						if (str.length) {
-							arr.push( str );
-						}
-					} else {
-						if (str.length) {
-							arr.push( str.trim() );
-						}
-					}
-					inside_quoted_region = !inside_quoted_region;
-					str = '';
-					break;
-				}
-				case ' ': {
-					if (bracket_opened || inside_quoted_region) {
-						str += input[i];
-						break;
-					}
-					if (!inside_quoted_region && str.length) {
-						arr.push( str.trim() );
-						str = '';
-					}
-					break;
-				}
-				default: {
-					str += input[i];
-				}
-			}
-		}
-		if (inside_quoted_region) {
+		function push() {
 			if (str.length) {
 				arr.push( str );
-			}
-		} else {
-			if (str.length) {
-				arr.push( str.trim() );
+				str = '';
 			}
 		}
 
-		return arr;
-	},
+		return function(input) {
+			var inside_quoted_region = false;
+
+			str = '';
+			arr = [];
+
+			for (var i = 0, l = input.length; i < l; i++) {
+				switch (input[i]) {
+					case '\'': {
+						inside_quoted_region = !inside_quoted_region;
+						push()
+						break;
+					}
+					case ' ': {
+						if (!inside_quoted_region) {
+							push()
+							break;
+						}
+					}
+					default: {
+						str += input[i];
+					}
+				}
+			}
+
+			push();
+
+			return arr;
+		}
+	})(),
 	parseValue: function(input, node, counters, $) {
 		var input = self.parseSpaceSeparatedString(input),
 			current,
@@ -306,9 +309,8 @@ Object.assign(self, {
 		}
 	},
 	replace(node, tag_name, $) {
-		var transfer = $("<" + tag_name + ">" + node.html() + "</" + tag_name + ">");
-
-		attributes = node.attr();
+		var transfer = $("<" + tag_name + ">" + node.html() + "</" + tag_name + ">"),
+			attributes = node.attr();
 
 		for (var key in attributes) {
 			transfer.attr(key, attributes[key]);
@@ -323,8 +325,6 @@ Object.assign(self, {
 			index_of_first_space = -1,
 			name,
 			value;
-
-		console.log(node.prop('tagName'), counter_reset)
 
 		if (counter_reset) {
 
@@ -392,25 +392,6 @@ Object.assign(self, {
 			}
 			node.removeAttr('counter-increment');
 		}
-
-		/*
-		var counter_increment = node.attr('counter-increment'),
-			name;
-
-		if (counter_increment) {
-			counter_increment = counter_increment.split(',');
-
-			for (var i = 0; i < counter_increment.length; i++) {
-				name = counter_increment[i].trim();
-
-				if (typeof counters[ name ].last() === 'number') {
-					counters[ name ][ counters[ name ].length - 1 ]++;
-				}
-			}
-
-			node.removeAttr('counter-increment');
-		}
-		*/
 	},
 	modifyAttributes: function(node, counters, $) {
 		var modify_attribute = node.attr('modify-attribute'),
@@ -447,17 +428,21 @@ Object.assign(self, {
 			name,
 			value;
 
+
 		if (modify_content) {
 			modify_content = modify_content.trim();
-			value = self.parseValue( modify_content, node, counters, $ );
+
+			value = self.parseValue( modify_content, node, counters, $ );			
+
 			node.html(value);
 			node.removeAttr('modify-content');
 		}
 	},
-	modifyTags: function(node, counters, $) {
+	modifyTag: function(node, counters, $) {
 		var modify_tag = node.attr('modify-tag'),
 			name,
 			value;
+
 
 		if (modify_tag) {
 			value = modify_tag.trim();
@@ -466,6 +451,8 @@ Object.assign(self, {
 			node = self.replace(node, value, $);
 			node.removeAttr('modify-tag');
 		}
+
+		return node;
 	},
 	removeAttributes: function(node, counters, $) {
 		var modify_attribute = node.attr('remove-attribute'),
@@ -482,17 +469,26 @@ Object.assign(self, {
 			node.removeAttr('remove-attribute');
 		}
 	},
-	applyCounters: function($nodes, counters, $) {
+	//applyCounters: function($nodes, counters, $) {
+	applyCounters: function($node, counters, $) {
+		/*
 		var $children = $();
 
 		$nodes.each(function(i, node) {
 			var node = $( node );
 
+			self.log(node.prop('tagName'), node.attr());
+			self.log('cyan', '\tresetCounters');
 			self.resetCounters( node, counters, $ );
+			self.log('cyan', '\tincrementCounters');
 			self.incrementCounters( node, counters, $ );
+			self.log('cyan', '\tmodifyAttributes');
 			self.modifyAttributes( node, counters, $ );
+			self.log('cyan', '\tmodifyContent');
 			self.modifyContent( node, counters, $ );
-			self.modifyTags( node, counters, $ );
+			self.log('cyan', '\tmodifyTag');
+			self.modifyTag( node, counters, $ );
+			self.log('cyan', '\tremoveAttributes');
 			self.removeAttributes( node, counters, $ );
 
 			$children = $children.add( node.children() )
@@ -500,24 +496,29 @@ Object.assign(self, {
 
 		if ($children.length) {
 			self.applyCounters( $children, counters, $ )
+		}*/
+		var lvl = $node.data('lvl');
+
+		if (lvl) {
+			$node.data('lvl', lvl++)
+		} else {
+			lvl = 0;
+			$node.data('lvl', lvl)
 		}
 
-		/*
-		self.log(node.prop('tagName'))
+		self.log('green', `applying to "${ $node.prop('tagName') }", lvl=${ lvl }`);
 
-		self.resetCounters( node, counters, $ );
-		self.incrementCounters( node, counters, $ );
-		self.modifyAttributes( node, counters, $ );
-		self.modifyContent( node, counters, $ );
-		self.modifyTags( node, counters, $ );
-		self.removeAttributes( node, counters, $ );
+		self.resetCounters( $node, counters, $ );
+		self.incrementCounters( $node, counters, $ );
+		self.modifyAttributes( $node, counters, $ );
+		self.modifyContent( $node, counters, $ );
+		$node = self.modifyTag( $node, counters, $ );
+		self.removeAttributes( $node, counters, $ );
 
-		//console.log(counters)
 
-		node.children().each(function(i, elem) {
+		$node.children().each(function(i, elem) {
 			self.applyCounters( $(elem), counters, $ );
 		})
-		*/
 	}
 });
 

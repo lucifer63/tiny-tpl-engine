@@ -1,34 +1,14 @@
-
-
-ol.toc, ol.toc ol {
-	counter-reset: toc;
+#main-ul,
+#random-list-item
+{
+	counter-reset: x;
 }
-ol li {
-	counter-increment: toc;
-}
-.toc li {
-	modify-content: "(Item " counter(toc) ") " content;
+li {
+	counter-increment: x;
+	modify-content: counter(x) content;
 }
 
-
-/* visible page "output"
-
-<ol class="toc">
-	<li>(Item 1)Intro</li>
-	<li>(Item 2)Topic
-		<ol>
-			<li>(Item 2.1)Subtopic</li>
-			<li>(Item 2.2)Subtopic</li>
-			<li>(Item 2.3)Subtopic</li>
-		</ol>
-	</li>
-	<li>(Item 3)Topic
-		<ol>
-			<li>(Item 3.1)Subtopic</li>
-			<li>(Item 3.2)Subtopic</li>
-			<li>(Item 3.3)Subtopic</li>
-		</ol>
-	</li>
-	<li>(Item 4)Closing</li>		
-</ol>
-*/
+div {
+	modify-tag: asd;
+	remove-attribute: lol;
+}

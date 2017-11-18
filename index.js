@@ -13,7 +13,7 @@ utils.templates	= {};
 utils.xml_trees	= {};
 utils.style		= '';
 
-utils.debug = false;
+utils.debug = true;
 
 if (process.argv.length < 3) {
 	throw new Error('Path to a folder containing .xml files must be passed!');
