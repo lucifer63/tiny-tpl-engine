@@ -2,30 +2,29 @@
 
 
 	<ul id="main-ul">
-		<li> Item</li>
-		<li> Item</li>
-		<li> Item</li>
-		<li> Item
+		<li>-1 Item</li>
+		<li>-2 Item</li>
+		<li>-3 Item</li>
+		<li>-4 Item
 			<ul>
-				<li> Item</li>
-				<li> Item</li>
-				<li id="random-list-item"> Item</li>
-				<li> Item</li>
-				<li> Item</li>
+				<li>-5 Item</li>
+				<li>-6 Item</li>
+				<li id="random-list-item">-1 Item</li>
+				<li>-2 Item</li>
+				<li>-3 Item</li>
 			</ul>
 		</li>
-		<li> Item</li>
-		<li> Item</li>
-		<li> Item</li>
-		<li> Item</li>
+		<li>-7 Item</li>
+		<li>-8 Item</li>
+		<li>-9 Item</li>
+		<li>-10 Item</li>
 	</ul>
 
 
-
+<!-- 
 	<task>Поговори со своим одноклассником, используя образец.</task>
-	<task icon="test">Или не поговори</task>
+	<task icon="test">Или не поговори</task> -->
 
-	<div lol="asd">asdasd</div>
 
 
 </chapter>

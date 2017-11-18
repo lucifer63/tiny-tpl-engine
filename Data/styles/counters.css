@@ -7,8 +7,3 @@ li {
 	counter-increment: x;
 	modify-content: counter(x) content;
 }
-
-div {
-	modify-tag: asd;
-	remove-attribute: lol;
-}

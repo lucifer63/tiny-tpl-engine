@@ -172,6 +172,8 @@ Object.assign(self, {
 						$transfer.attr(key, attributes[key]);
 					}
 
+					$transfer.data( $initial_element.data() );
+
 					$transfer.find('if').each(function(i, elem) {
 						var $if = $( elem ), 
 							condition = $if.attr('condition');
@@ -217,12 +219,6 @@ Object.assign(self, {
 
 			$elem.removeAttr('style');
 		});
-	},
-	checkBrackets: function(input) {
-		if (input.split('(').length !== input.split(')').length) {
-			throw new Error(`CSS value "${input}" has some extra/forgotten brackets!`);
-		}
-		return true;
 	},
 	parseSpaceSeparatedString: (function() {
 		var str, arr;
@@ -315,6 +311,8 @@ Object.assign(self, {
 		for (var key in attributes) {
 			transfer.attr(key, attributes[key]);
 		}
+
+		transfer.data( node.data() );
 
 		node.replaceWith( transfer );
 
@@ -470,7 +468,7 @@ Object.assign(self, {
 		}
 	},
 	//applyCounters: function($nodes, counters, $) {
-	applyCounters: function($node, counters, $) {
+	applyCounters: function($node, counters, $, lvl) {
 		/*
 		var $children = $();
 
@@ -497,14 +495,12 @@ Object.assign(self, {
 		if ($children.length) {
 			self.applyCounters( $children, counters, $ )
 		}*/
-		var lvl = $node.data('lvl');
 
-		if (lvl) {
-			$node.data('lvl', lvl++)
-		} else {
+		if (!lvl) {
 			lvl = 0;
-			$node.data('lvl', lvl)
 		}
+
+		$node.data('lvl', lvl);
 
 		self.log('green', `applying to "${ $node.prop('tagName') }", lvl=${ lvl }`);
 
@@ -515,9 +511,8 @@ Object.assign(self, {
 		$node = self.modifyTag( $node, counters, $ );
 		self.removeAttributes( $node, counters, $ );
 
-
 		$node.children().each(function(i, elem) {
-			self.applyCounters( $(elem), counters, $ );
+			self.applyCounters( $(elem), counters, $, lvl + 1 );
 		})
 	}
 });

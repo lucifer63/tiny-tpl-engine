@@ -69,6 +69,10 @@ function applyTemplates(resolve, reject) {
 	resolve();
 }
 
+
+
+//$(destination).data( $(source).data() );
+
 function inlineStyles(resolve, reject) {
 	utils.log('Starting to inlineStyles.')
 	for (var tree in utils.xml_trees) {
