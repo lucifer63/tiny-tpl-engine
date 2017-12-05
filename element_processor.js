@@ -393,8 +393,15 @@ Object.assign(self, {
 			self.applyCounters( $(elem), counters, $, lvl + 1 );
 		})
 	},
-	executeScripts: function() {
-		
+	executeScripts: function($) {
+		try {
+			for (var filename of utils.scripts.keys()) {
+				eval(utils.scripts.get(filename));
+			}
+		} catch(e) {
+			e.message = `Error occured during execution of "${ filename }" script: ` + e.message;
+			throw e;
+		}
 	}
 });
 

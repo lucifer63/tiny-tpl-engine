@@ -54,40 +54,72 @@ ignite([
 
 function readTemplates(finish, abort) {
 	utils.log('Starting to readTemplates.')
+	var dirname = project_folder + '\\' + config.folders.templates;
+
+	if (!utils.fs.existsSync(dirname)) {
+		console.log(`There is no "${ dirname }" directory!`);
+		return finish();
+	}
+
 	utils.readDir({
 		dirname: project_folder + '\\' + config.folders.templates,
-		onFile: (i, filename, content) => utils.templates[ filename.split('.')[0] ] = content,
-		callback: () => {
-			utils.log('Finished procedure readTemplates.')
-			finish();
+		callback: files => {
+			if (!files.size) {
+				console.log(`No files found in "${ dirname }" directory!`);
+				return finish();
+			}
+			for (var filename of files.keys()) {
+				utils.templates[ filename.split('.')[0] ] = files.get(filename);
+			}
+			utils.log('Finished procedure readTemplates.');
+			return finish();
+
 		}
 	});
 }
 
 function readAndProcessXMLFiles(finish, abort) {
 	utils.log('Starting to readAndProcessXMLFiles.')
+	var dirname = project_folder + '\\' + config.folders.articles_raw;
+
+	if (!utils.fs.existsSync(dirname)) {
+		return abort(`There is no "${ dirname }" directory!`);
+	}
+
 	utils.readDir({
 		dirname: project_folder + '\\' + config.folders.articles_raw,
-		onFile: (i, filename, content) => utils.xml_trees[ filename.split('.')[0] ] = utils.cheerio.load( content, { xmlMode: true, decodeEntities: false }),
-		callback: () => {
-			utils.log('Finished procedure readAndProcessXMLFiles.')
-			finish();
+		callback: files => {
+			if (!files.size) {
+				return abort(`No files found in "${ dirname }" directory!`);
+			}
+			utils.log('Finished procedure readAndProcessXMLFiles.');
+			return finish();
 		}
 	});
 }
 
 function readStyles(finish, abort) {
 	utils.log('Starting to readStyles.')
+	var dirname = project_folder + '\\' + config.folders.styles;
+
+	if (!utils.fs.existsSync(dirname)) {
+		console.log(`There is no "${ dirname }" directory!`);
+		return finish();
+	}
 
 	var	extension = '.css',
-		contents = [],
 		options = {
 			dirname: project_folder + '\\' + config.folders.styles,
-			onFile: (i, filename, content) => contents[i] = content,
-			callback: () => {
-				utils.style = contents.join('\n');
-				utils.log('Finished procedure readStyles.')
-				finish();
+			callback: files => {
+				if (!files.size) {
+					console.log(`No files found in "${ dirname }" directory!`);
+					return finish();
+				}
+				for (var css_code of files.values()) {
+					utils.style += css_code + '\n';
+				}
+				utils.log('Finished procedure readStyles.');
+				return finish();
 			}
 		};
 
@@ -102,16 +134,24 @@ function readStyles(finish, abort) {
 
 function readScripts(finish, abort) {
 	utils.log('Starting to readScripts.')
+	var dirname = project_folder + '\\' + config.folders.scripts;
+
+	if (!utils.fs.existsSync(dirname)) {
+		console.log(`There is no "${ dirname }" directory!`);
+		return finish();
+	}
 
 	var	extension = '.js',
-		contents = [],
 		options = {
 			dirname: project_folder + '\\' + config.folders.scripts,
-			onFile: (i, filename, content) => contents[i] = content,
-			callback: () => {
-				utils.scripts = contents;
-				utils.log('Finished procedure readScripts.')
-				finish();
+			callback: files => {
+				if (!files.size) {
+					console.log(`No files found in "${ dirname }" directory!`);
+					return finish();
+				}
+				utils.scripts = files;
+				utils.log('Finished procedure readScripts.');
+				return finish();
 			}
 		};
 
@@ -130,8 +170,8 @@ function applyTemplates(finish, abort) {
 		element_processor.applyTemplates( utils.xml_trees[ tree ] );
 	}
 	delete utils.templates;
-	utils.log('Finished procedure applyTemplates.')
-	finish();
+	utils.log('Finished procedure applyTemplates.');
+	return finish();
 }
 
 function inlineStyles(finish, abort) {
@@ -140,8 +180,8 @@ function inlineStyles(finish, abort) {
 		utils.juice.inlineDocument( utils.xml_trees[tree], utils.style);
 		element_processor.styleToAttributes( utils.xml_trees[ tree ] );
 	}
-	utils.log('Finished procedure inlineStyles.')
-	finish();
+	utils.log('Finished procedure inlineStyles.');
+	return finish();
 }
 
 function applyCounters(finish, abort) {
@@ -149,17 +189,17 @@ function applyCounters(finish, abort) {
 	for (var tree in utils.xml_trees) {
 		element_processor.applyCounters( utils.xml_trees[tree].root(), {}, utils.xml_trees[tree] );
 	}
-	utils.log('Finished procedure applyCounters.')
-	finish();
+	utils.log('Finished procedure applyCounters.');
+	return finish();
 }
 
 function executeScripts(finish, abort) {
 	utils.log('Starting to executeScripts.')
 	for (var tree in utils.xml_trees) {
-		element_processor.executeScripts( utils.xml_trees[tree].root(), utils.xml_trees[tree] );
+		element_processor.executeScripts( utils.xml_trees[tree] );
 	}
-	utils.log('Finished procedure executeScripts.')
-	finish();
+	utils.log('Finished procedure executeScripts.');
+	return finish();
 }
 
 function saveFiles() {
@@ -172,7 +212,7 @@ function saveFiles() {
 		dirname: project_folder + '\\' + config.folders.articles,
 		file_object: utils.xml_trees,
 		callback: () => {
-			utils.log('Finished procedure saveFiles.')
+			utils.log('Finished procedure saveFiles.');
 		}
 	});
 }

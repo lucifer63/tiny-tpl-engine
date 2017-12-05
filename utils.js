@@ -114,25 +114,29 @@ Object.assign(self, {
 			});
 		}
 	},
-	// dirname, files, onFile, callback
+	// dirname, files, callback
 	readFiles: function(options) {
-		var processed = 0;
+		var processed = 0,
+			files = new Map();
 
 		options.files.forEach(function(filename, i) { 
+			files.set(filename, i);
 			self.fs.readFile(options.dirname + '\\' + filename, 'utf-8', function(err, content) { 
 				if (err) {
 					utils.throwErr(err); 
 					return; 
 				} 
-				options.onFile(i, filename, content); 
+
+				files.set(filename, content);
+				
 				processed++;
 				if (options.files.length === processed && typeof options.callback === 'function') {
-					options.callback(); 
+					options.callback( files ); 
 				} 
 			}); 
 		}); 
 	},
-	// dirname, onFile, callback
+	// dirname, callback
 	readDir: function(options) {
 		self.fs.readdir(options.dirname, function(err, filenames) { 
 			if (err) { 
