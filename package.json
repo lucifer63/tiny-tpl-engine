@@ -13,7 +13,8 @@
     "grunt-cli": "^1.2.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-prettify": "^0.4.0",
-    "juice": "^4.2.2"
+    "juice": "^4.2.2",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {},
   "repository": {

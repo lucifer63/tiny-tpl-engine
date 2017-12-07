@@ -9,6 +9,7 @@ const 	resolve 		= require('path').resolve,
 utils.fs		= require('fs');
 utils.cheerio	= require('cheerio');
 utils.juice		= require('juice');
+utils.mkdirp	= require('mkdirp');
 utils.templates	= {};
 utils.xml_trees	= {};
 utils.style		= '';
@@ -19,8 +20,6 @@ utils.debug = false;
 if (process.argv.length < 3) {
 	throw new Error('Path to a folder containing .xml files must be passed!');
 }
-
-
 
 const	project_folder	= resolve(process.argv[2]),
 		config_json		= utils.fs.readFileSync(project_folder + '\\tiny-tpl-engine.cfg', 'utf-8')
@@ -120,8 +119,10 @@ function readStyles(finish, abort) {
 					console.log(`No files found in "${ dirname }" directory!`);
 					return finish();
 				}
-				for (var css_code of files.values()) {
-					utils.style += css_code + '\n';
+				for (var filename of files.keys()) {
+					if (filename.slice(-extension.length) === extension) {
+						utils.style += files.get(filename) + '\n';	
+					}
 				}
 				utils.log('Finished procedure readStyles.');
 				return finish();

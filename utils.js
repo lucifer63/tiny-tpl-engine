@@ -101,18 +101,24 @@ Object.assign(self, {
 		var files_amount = Object.keys(options.file_object).length,
 			processed = 0;
 
-		for (var filename in options.file_object) {
-			self.fs.writeFile(options.dirname + '\\' + filename + '.xml', options.file_object[ filename ], function(err) {
-				if (err) { 
-					utils.throwErr(err); 
-					return; 
-				} 
-				processed++;
-				if (files_amount === processed && typeof options.callback === 'function') { 
-					options.callback(); 
-				} 
-			});
-		}
+		utils.mkdirp(options.dirname, function(err) {
+			if (err) { 
+				utils.throwErr(err); 
+				return; 
+			} 
+			for (var filename in options.file_object) {
+				self.fs.writeFile(options.dirname + '\\' + filename + '.xml', options.file_object[ filename ], function(err) {
+					if (err) { 
+						utils.throwErr(err); 
+						return; 
+					} 
+					processed++;
+					if (files_amount === processed && typeof options.callback === 'function') { 
+						options.callback(); 
+					} 
+				});
+			}
+		})
 	},
 	// dirname, files, callback
 	readFiles: function(options) {
@@ -144,19 +150,8 @@ Object.assign(self, {
 				return; 
 			} 
 
-			if (!filenames.length) {
-				if (important) {
-					utils.throwErr( new Error(`Directory ${ options.dirname } is empty!`) );	
-				} else {
-					self.log(`Directory ${ options.dirname } is empty!`);
-				}
-				if (typeof options.callback() === 'function') {
-					options.callback()
-				}
-			} else {
-				options.files = filenames;
-				utils.readFiles(options);
-			}
+			options.files = filenames;
+			utils.readFiles(options);
 		}); 
 	}
 });
