@@ -5,9 +5,24 @@ module.exports = function(grunt) {
 		extract_texttags	= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi');
 	*/
 
-	var inline_elements		= [];
-
 	//inline_elements = JSON.parse(extract_texttags.exec(config)[1]);
+
+	var inline_elements		= [],
+		path				= grunt.option('path');
+
+	if (!path) {
+		throw new Error('Can\'t proceed without path to project!');
+	}
+
+	var config_json = grunt.file.read(path + '\\tiny-tpl-engine.cfg')
+		.replace(
+			/\b([a-z-_]+)\b(?=\s*:)/g, 
+			function(match, m1) {
+				return '"' + m1 + '"';
+			}
+		)
+		.replace(/\\/g,'\\\\'),
+		config = JSON.parse(config_json);
 
 	inline_elements.push("img");
 
@@ -22,11 +37,11 @@ module.exports = function(grunt) {
 			},
 			all: {
 				expand: true,
-				cwd: 'Data/articles',
+				cwd: path + '\\' + config.folders.articles,
 				ext: '.xml',
 				src: ['*.xml'],
-				dest: 'Data/articles'
-			},
+				dest: path + '\\' + config.folders.articles
+			}
 		}
 	});
 

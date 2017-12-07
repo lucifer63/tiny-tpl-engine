@@ -395,8 +395,10 @@ Object.assign(self, {
 	},
 	executeScripts: function($) {
 		try {
-			for (var filename of utils.scripts.keys()) {
-				eval(utils.scripts.get(filename));
+			if (utils.scripts && utils.scripts.size) {
+				for (var filename of utils.scripts.keys()) {
+					eval(utils.scripts.get(filename));
+				}
 			}
 		} catch(e) {
 			e.message = `Error occured during execution of "${ filename }" script: ` + e.message;

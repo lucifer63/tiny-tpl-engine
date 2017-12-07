@@ -20,6 +20,8 @@ if (process.argv.length < 3) {
 	throw new Error('Path to a folder containing .xml files must be passed!');
 }
 
+
+
 const	project_folder	= resolve(process.argv[2]),
 		config_json		= utils.fs.readFileSync(project_folder + '\\tiny-tpl-engine.cfg', 'utf-8')
 			.replace(
@@ -91,6 +93,9 @@ function readAndProcessXMLFiles(finish, abort) {
 		callback: files => {
 			if (!files.size) {
 				return abort(`No files found in "${ dirname }" directory!`);
+			}
+			for (var filename of files.keys()) {
+				utils.xml_trees[ filename.split('.')[0] ] = utils.cheerio.load( files.get(filename), { xmlMode: true, decodeEntities: false });
 			}
 			utils.log('Finished procedure readAndProcessXMLFiles.');
 			return finish();
@@ -202,7 +207,7 @@ function executeScripts(finish, abort) {
 	return finish();
 }
 
-function saveFiles() {
+function saveFiles(finish, abort) {
 	utils.log('Starting to saveFiles.')
 	for (var tree in utils.xml_trees) {
 		utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
@@ -213,6 +218,7 @@ function saveFiles() {
 		file_object: utils.xml_trees,
 		callback: () => {
 			utils.log('Finished procedure saveFiles.');
+			return finish();
 		}
 	});
 }
