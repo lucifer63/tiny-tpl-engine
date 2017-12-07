@@ -64,7 +64,7 @@ function readTemplates(finish, abort) {
 	}
 
 	utils.readDir({
-		dirname: project_folder + '\\' + config.folders.templates,
+		dirname: dirname,
 		callback: files => {
 			if (!files.size) {
 				console.log(`No files found in "${ dirname }" directory!`);
@@ -89,7 +89,7 @@ function readAndProcessXMLFiles(finish, abort) {
 	}
 
 	utils.readDir({
-		dirname: project_folder + '\\' + config.folders.articles_raw,
+		dirname: dirname,
 		callback: files => {
 			if (!files.size) {
 				return abort(`No files found in "${ dirname }" directory!`);
@@ -114,7 +114,7 @@ function readStyles(finish, abort) {
 
 	var	extension = '.css',
 		options = {
-			dirname: project_folder + '\\' + config.folders.styles,
+			dirname: dirname,
 			callback: files => {
 				if (!files.size) {
 					console.log(`No files found in "${ dirname }" directory!`);
@@ -148,7 +148,7 @@ function readScripts(finish, abort) {
 
 	var	extension = '.js',
 		options = {
-			dirname: project_folder + '\\' + config.folders.scripts,
+			dirname: dirname,
 			callback: files => {
 				if (!files.size) {
 					console.log(`No files found in "${ dirname }" directory!`);
