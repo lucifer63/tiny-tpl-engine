@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 		.replace(/\\/g,'\\\\'),
 		config = JSON.parse(config_json);
 
-	inline_elements.push("img");
+	inline_elements.push("img", "nobr");
 
 	grunt.initConfig({
 		prettify: {
