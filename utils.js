@@ -97,7 +97,6 @@ Object.assign(self, {
 	})(),
 	// dirname, file_object, callback
 	saveFiles: function(options) {
-
 		var files_amount = Object.keys(options.file_object).length,
 			processed = 0;
 

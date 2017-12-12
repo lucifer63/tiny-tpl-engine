@@ -3,8 +3,33 @@
 global.element_processor = {};
 var self = element_processor;
 
+utils.cheerio.prototype.eachTextNode = function(processor, callback) {
+	var textNodes = this.contents().filter(function() {
+		return this.type === 'text';
+	});
+
+	textNodes.each( processor );
+
+	if (typeof callback === 'function') {
+		callback.call(this);
+	}
+
+	return this;
+}
+
 Object.assign(self, {
 	temp: null,
+	replaceAndPreserveData: function($source, $transfer) {
+		$source.replaceWith($transfer);
+
+		var attributes = $source.attr();
+
+		for (var key in attributes) {
+			$transfer.attr(key, attributes[key]);
+		}
+
+		$transfer.data( $source.data() );
+	},
 	evalCondition: function(condition) {
 		return condition ? eval( condition ) : true;
 	},
@@ -26,15 +51,16 @@ Object.assign(self, {
 					var $initial_element = $( elem );
 
 					$transfer = $( utils.templates[ tag_name ].replace(RegExp.content_marker, $(this).html() ).trim_empty_lines() )
-					$initial_element.replaceWith( $transfer )
+					
+					self.replaceAndPreserveData( $initial_element, $transfer );
 
-					attributes = $( this ).attr();
+					/*attributes = $( this ).attr();
 
 					for (var key in attributes) {
 						$transfer.attr(key, attributes[key]);
 					}
 
-					$transfer.data( $initial_element.data() );
+					$transfer.data( $initial_element.data() );*/
 
 					$transfer.find('if').each(function(i, elem) {
 						var $if = $( elem ), 
@@ -372,7 +398,7 @@ Object.assign(self, {
 		if (!lvl) {
 			lvl = 0;
 		}
-
+		
 		$node.data('lvl', lvl);
 
 		utils.log('green', `applying to "${ $node.prop('tagName') }", lvl=${ lvl }`);

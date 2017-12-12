@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 		.replace(/\\/g,'\\\\'),
 		config = JSON.parse(config_json);
 
-	inline_elements.push("img", "nobr");
+	//inline_elements.push("img", "nobr");
 
 	grunt.initConfig({
 		prettify: {
@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 				indent: 1,
 				indent_char: '\t',
 				max_preserve_newlines: 1,
-				unformatted: inline_elements
+				//unformatted: inline_elements
 			},
 			all: {
 				expand: true,

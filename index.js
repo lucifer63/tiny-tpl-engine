@@ -1,7 +1,6 @@
 'use strict';
 
 require('.//utils.js');
-require('.//element_processor.js');
 
 const 	resolve 		= require('path').resolve,
 		default_folders	= [ "styles", "scripts", "templates", "configs", "articles_raw", "articles" ];
@@ -14,6 +13,8 @@ utils.templates	= {};
 utils.xml_trees	= {};
 utils.style		= '';
 utils.scripts	= {};
+
+require('.//element_processor.js');
 
 utils.debug = false;
 
@@ -201,6 +202,9 @@ function applyCounters(finish, abort) {
 
 function executeScripts(finish, abort) {
 	utils.log('Starting to executeScripts.')
+
+	//console.log( utils.xml_trees.paragraph_20.html() );
+
 	for (var tree in utils.xml_trees) {
 		element_processor.executeScripts( utils.xml_trees[tree] );
 	}
