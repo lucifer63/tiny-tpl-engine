@@ -2,12 +2,19 @@
 
 ## Table of Contents
 
+- [To do](#to-do)
 - [Some features](#some-features)
 - [Install](#install)
 - [Usage](#usage)
 - [Tools](#tools)
 - [Author](#author)
 - [License](#license)
+
+## To do
+
+1. Catch circular references in templates,
+1. Implement [*@counter-style*](https://developer.mozilla.org/en-US/docs/Web/CSS/%40counter-style),
+1. Preserve template tag names at least till styling.
 
 ## Some features
 
