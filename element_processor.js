@@ -98,11 +98,16 @@ Object.assign(self, {
 	styleToAttributes: function( $ ) {
 		$( '[style]' ).each(function(i, elem) {
 			var $elem = $( elem ),
-				styles = $elem.attr('style').split(';');
+				styles = $elem.attr('style').split(';'),
+				current_attr;
 
 			for (var i = 0; i < styles.length - 1; i++) {
 				styles[i] = styles[i].trim().split(':');
-				$elem.attr(styles[i][0].trim(), styles[i][1].trim());
+				current_attr = styles[i][0].trim();
+
+				if (typeof $elem.attr(current_attr) === 'undefined') {
+					$elem.attr(current_attr, styles[i][1].trim());
+				}
 			}
 
 			$elem.removeAttr('style');
