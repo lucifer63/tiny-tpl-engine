@@ -36,6 +36,8 @@ global.ignite = function( fuse ) {
 
 		end_of_the_wick = end_of_the_wick.then(f);
 	}
+
+	return end_of_the_wick;
 };
 
 Object.assign(RegExp, {

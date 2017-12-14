@@ -205,11 +205,31 @@ function executeScripts(finish, abort) {
 
 	//console.log( utils.xml_trees.paragraph_20.html() );
 
-	for (var tree in utils.xml_trees) {
-		element_processor.executeScripts( utils.xml_trees[tree] );
+	//var scripts_promise_array = utils.scripts.map();
+
+
+
+	var global_scripts_promise = ignite( [function(res, rej) {
+		console.log('Starting global sripts promise');
+		var promise = ignite([ function(resolve, reject) {
+			console.log('Starting local scripts promise');
+			setTimeout(resolve, 2000)
+		} ]).then(res);
+	}] );
+
+	//ignite([  ])
+
+
+	if (utils.scripts && utils.scripts.size) {
+		for (var tree in utils.xml_trees) {
+			element_processor.executeScripts( utils.xml_trees[tree] );
+		}
+
+		global_scripts_promise.then(function() {
+			utils.log('Finished procedure executeScripts.');
+			return finish();		
+		})
 	}
-	utils.log('Finished procedure executeScripts.');
-	return finish();
 }
 
 function saveFiles(finish, abort) {
