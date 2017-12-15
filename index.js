@@ -210,7 +210,7 @@ function executeScripts(finish, abort) {
 
 
 	var global_scripts_promise = ignite( [function(res, rej) {
-		console.log('Starting global sripts promise');
+		console.log('Starting global scripts promise');
 		var promise = ignite([ function(resolve, reject) {
 			console.log('Starting local scripts promise');
 			setTimeout(resolve, 2000)
