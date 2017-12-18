@@ -197,9 +197,6 @@ Object.assign(self, {
 				}
 
 				output += counter[index].last();
-				if (current === 'inner-task-item') {
-					console.log(lvl, index, counter[index].last())
-				}
 				/* processing counter f */
 			} else {
 				output += current
@@ -267,17 +264,10 @@ Object.assign(self, {
 					counters[ name ][ lvl ] = [];
 				}
 
-
 				counters[ name ][ lvl ].push( value );
-				if (name === 'inner-task-item') {
-					console.log(name)
-					console.log(lvl)
-					console.log(counters[ name ])
-					console.log(counters[ name ][ lvl ])
-				}
 				/* processing counter f */
 			}
-			//node.removeAttr('counter-reset');
+			node.removeAttr('counter-reset');
 		}
 	},
 	incrementCounter: function(node, counters, $) {
@@ -332,7 +322,7 @@ Object.assign(self, {
 				}
 				/* processing counter f */
 			}
-			//node.removeAttr('counter-increment');
+			node.removeAttr('counter-increment');
 		}
 	},
 	modifyAttribute: function(node, counters, $) {
@@ -415,7 +405,6 @@ Object.assign(self, {
 		}
 		
 		$node.data('lvl', lvl);
-		$node.attr('lvl', lvl);
 
 		utils.log('green', `applying to "${ $node.prop('tagName') }", lvl=${ lvl }`);
 

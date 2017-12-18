@@ -1,30 +1,25 @@
 module.exports = function(grunt) {
 
-	/*
-	var config				= grunt.file.read('Data/configs/config.cfg'),
-		extract_texttags	= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi');
-	*/
-
-	//inline_elements = JSON.parse(extract_texttags.exec(config)[1]);
-
-	var inline_elements		= [],
-		path				= grunt.option('path');
+	var path = grunt.option('path');
 
 	if (!path) {
 		throw new Error('Can\'t proceed without path to project!');
 	}
 
-	var config_json = grunt.file.read(path + '\\tiny-tpl-engine.cfg')
-		.replace(
-			/\b([a-z-_]+)\b(?=\s*:)/g, 
-			function(match, m1) {
-				return '"' + m1 + '"';
-			}
-		)
-		.replace(/\\/g,'\\\\'),
-		config = JSON.parse(config_json);
+	var tpl_config_json = grunt.file.read(path + '\\tiny-tpl-engine.cfg')
+			.replace(
+				/\b([a-z-_]+)\b(?=\s*:)/g, 
+				function(match, m1) {
+					return '"' + m1 + '"';
+				}
+			)
+			.replace(/\\/g,'\\\\'),
+		tpl_config 			= JSON.parse(tpl_config_json),
+		project_config		= grunt.file.read(path + '\\Data\\configs\\config.cfg'),
+		extract_texttags	= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi'),
+		inline_elements		= JSON.parse(extract_texttags.exec(project_config)[1]);
 
-	//inline_elements.push("img", "nobr");
+	inline_elements.push("nobr");
 
 	grunt.initConfig({
 		prettify: {
@@ -33,14 +28,14 @@ module.exports = function(grunt) {
 				indent: 1,
 				indent_char: '\t',
 				max_preserve_newlines: 1,
-				//unformatted: inline_elements
+				unformatted: inline_elements
 			},
 			all: {
 				expand: true,
-				cwd: path + '\\' + config.folders.articles,
+				cwd: path + '\\' + tpl_config.folders.articles,
 				ext: '.xml',
 				src: ['*.xml'],
-				dest: path + '\\' + config.folders.articles
+				dest: path + '\\' + tpl_config.folders.articles
 			}
 		}
 	});
