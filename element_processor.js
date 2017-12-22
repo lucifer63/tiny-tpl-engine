@@ -50,7 +50,7 @@ Object.assign(self, {
 				$elements.each(function(i, elem) {
 					var $initial_element = $( elem );
 
-					$transfer = $( utils.templates[ tag_name ].replace(RegExp.content_marker, $(this).html() ).trim_empty_lines() )
+					$transfer = $( utils.templates[ tag_name ].replace(RegExp.content_marker, $(this).html() ).trim_empty_lines() );
 					
 					self.replaceAndPreserveData( $initial_element, $transfer );
 

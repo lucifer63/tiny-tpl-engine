@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 		extract_texttags	= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi'),
 		inline_elements		= JSON.parse(extract_texttags.exec(project_config)[1]);
 
-	inline_elements.push("nobr");
+	inline_elements.push("text", "nobr");
 
 	grunt.initConfig({
 		prettify: {

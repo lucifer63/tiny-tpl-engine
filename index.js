@@ -33,6 +33,9 @@ const	project_folder	= resolve(process.argv[2]),
 			.replace(/\\/g,'\\\\'),
 		config			= JSON.parse(config_json);
 
+config.project_folder = project_folder;
+utils.config = config;
+
 if (!config.folders) {
 	config.folders = {};
 }
