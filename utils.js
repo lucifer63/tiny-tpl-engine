@@ -55,6 +55,14 @@ String.prototype.trim_empty_lines = function() {
 	return this.replace(RegExp.empty_lines, '');
 }
 
+// native String.prototype.*With is very slow
+String.prototype.startsWith = function( str ) {
+	return str.length > 0 && this.substring( 0, str.length ) === str;
+}
+String.prototype.endsWith = function( str ) {
+	return str.length > 0 && this.substring( this.length - str.length, this.length ) === str;
+}
+
 Object.assign(self, {
 	throwErr: function(err) {
 		throw err;
