@@ -16,7 +16,7 @@
 1. Implement [*@counter-style*](https://developer.mozilla.org/en-US/docs/Web/CSS/%40counter-style),
 1. Preserve template tag names at least till styling,
 1. Implement asynchronous custom scripts execution,
-1. Fix counters, (bug sample)[https://jsfiddle.net/lucifer63/c4gvc66j/],
+1. Fix counters, [bug sample](https://jsfiddle.net/lucifer63/c4gvc66j/),
 1. Implement *$.findAndSeparateByLevel*.
 
 ## Some features
