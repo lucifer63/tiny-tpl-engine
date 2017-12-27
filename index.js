@@ -16,7 +16,7 @@ utils.scripts	= {};
 
 require('.//element_processor.js');
 
-utils.debug = false;
+utils.debug = true;
 
 if (process.argv.length < 3) {
 	throw new Error('Path to a folder containing .xml files must be passed!');
@@ -205,13 +205,13 @@ function executeScripts(finish, abort) {
 
 
 
-	var global_scripts_promise = ignite( [function(res, rej) {
-		console.log('Starting global scripts promise');
-		var promise = ignite([ function(resolve, reject) {
-			console.log('Starting local scripts promise');
-			setTimeout(resolve, 2000)
-		} ]).then(res);
-	}] );
+	// var global_scripts_promise = ignite( [function(res, rej) {
+	// 	console.log('Starting global scripts promise');
+	// 	var promise = ignite([ function(resolve, reject) {
+	// 		console.log('Starting local scripts promise');
+	// 		setTimeout(resolve, 2000)
+	// 	} ]).then(res);
+	// }] );
 
 	//ignite([  ])
 
@@ -221,11 +221,11 @@ function executeScripts(finish, abort) {
 			element_processor.executeScripts( utils.xml_trees[tree] );
 		}
 
-		global_scripts_promise.then(function() {
-			utils.log('Finished procedure executeScripts.');
-			return finish();		
-		})
 	}
+	// global_scripts_promise.then(function() {		
+	// })
+	utils.log('Finished procedure executeScripts.');
+	return finish();
 }
 
 function saveFiles(finish, abort) {
