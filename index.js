@@ -16,7 +16,7 @@ utils.scripts	= {};
 
 require('.//element_processor.js');
 
-utils.debug = true;
+utils.debug = false;
 
 if (process.argv.length < 3) {
 	throw new Error('Path to a folder containing .xml files must be passed!');
