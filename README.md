@@ -22,7 +22,7 @@
 ## Some features
 
 At the moment tiny-tpl-engine is capable of:
-1. Replacing an element that has some specific tagname with the corresponding template element. Templates are get defined in `Data\templates` directory. For example, imagine you want to have your `<test>` elements treated as templates, in order to accomplish this you have to create `Data\templates\test.tpl` file and here is what it will look like:
+1. Replacing an element that has some specific tagname with the corresponding template element. Templates are get defined in `Data\templates` directory. For example, imagine you want to have your `<test>` elements treated as a template, in order to accomplish this you have to create `Data\templates\test.tpl` file and here is what it will look like:
 
 ```html
 <div>
