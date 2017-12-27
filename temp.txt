@@ -1,0 +1,1 @@
+{"folders":{"styles":"Data/styles","scripts":"Data/scripts","templates":"Data/templates","configs":"Data/configs","articles_raw":"Data/articles_raw","articles":"Data/articles"}}

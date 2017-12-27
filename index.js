@@ -22,16 +22,9 @@ if (process.argv.length < 3) {
 	throw new Error('Path to a folder containing .xml files must be passed!');
 }
 
-const	project_folder	= resolve(process.argv[2]),
-		config_json		= utils.fs.readFileSync(project_folder + '\\tiny-tpl-engine.cfg', 'utf-8')
-			.replace(
-				/\b([a-z-_]+)\b(?=\s*:)/g, 
-				function(match, m1) {
-					return '"' + m1 + '"';
-				}
-			)
-			.replace(/\\/g,'\\\\'),
-		config			= JSON.parse(config_json);
+const	project_folder		= resolve(process.argv[2]),
+		config_fake_json	= utils.fs.readFileSync(project_folder + '\\tiny-tpl-engine.cfg', 'utf-8').replace(/\//g, '\\\\'),
+		config				= eval('(' + config_fake_json + ')');
 
 config.project_folder = project_folder;
 utils.config = config;

@@ -6,18 +6,11 @@ module.exports = function(grunt) {
 		throw new Error('Can\'t proceed without path to project!');
 	}
 
-	var tpl_config_json = grunt.file.read(path + '\\tiny-tpl-engine.cfg')
-			.replace(
-				/\b([a-z-_]+)\b(?=\s*:)/g, 
-				function(match, m1) {
-					return '"' + m1 + '"';
-				}
-			)
-			.replace(/\\/g,'\\\\'),
-		tpl_config 			= JSON.parse(tpl_config_json),
-		project_config		= grunt.file.read(path + '\\Data\\configs\\config.cfg'),
-		extract_texttags	= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi'),
-		inline_elements		= JSON.parse(extract_texttags.exec(project_config)[1]);
+	var tpl_config_fake_json	= grunt.file.read(path + '\\tiny-tpl-engine.cfg').replace(/\//g, '\\\\'),
+		tpl_config				= eval('(' + tpl_config_fake_json + ')'),
+		project_config			= grunt.file.read(path + '\\Data\\configs\\config.cfg'),
+		extract_texttags		= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi'),
+		inline_elements			= JSON.parse(extract_texttags.exec(project_config)[1]);
 
 	inline_elements.push("text", "nobr");
 
