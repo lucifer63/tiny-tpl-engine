@@ -189,7 +189,6 @@ function executeScripts(finish, abort) {
 		var i = 0,
 			document_scripts_array = new Array( utils.xml_trees.length );
 
-
 		for (var tree in utils.xml_trees) {
 			document_scripts_array[ i++ ] = element_processor.executeScripts(utils.xml_trees[tree], tree);
 		}
