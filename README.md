@@ -2,7 +2,7 @@
 
 *Tiny-tpl-engine* is a little XML template engine. It's main features are XML syntax, logic in templates, property-to-attribute CSS inlining and custom CSS properties for changing element' content, tagname and attributes. These last metioned custom properties are still in development.
 
-**Описание также доступно на русском - [README_ru.md](https://github.com/lucifer63/tiny-tpl-engine/README_ru.md)**
+**Описание также доступно на русском - [README_ru.md](https://github.com/lucifer63/tiny-tpl-engine/blob/master/README_ru.md)**
 
 ## Table of Contents
 
