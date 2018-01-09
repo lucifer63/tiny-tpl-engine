@@ -1,31 +1,31 @@
 # tiny-tpl-engine
 
-*Tiny-tpl-engine* это простой XML шаблонизатор. Особенности: XML синтаксис, логика в шаблонах, инлайн CSS свойств в атрибуты и кастомные CSS свойства для управления контентом, тегами и атрибутами элементов. Управляющие свойства пока что в разработке.
+*Tiny-tpl-engine* это простой XML шаблонизатор. Особенности: XML синтаксис, логика в шаблонах, инлайн CSS свойств в атрибуты и кастомные CSS свойства для изменения контента, тега и атрибутов элементов. Управляющие свойства пока что в разработке.
 
 ## Table of Contents
 
-- [Some features](#some-features)
-- [Install](#install)
-- [Usage](#usage)
-- [Tools](#tools)
-- [Author](#author)
-- [License](#license)
+- [Возможности](#Возможности)
+- [Установка](#Установка)
+- [Запуск](#Запуск)
+- [Инструменты](#Инструменты)
+- [Автор](#Автор)
+- [Лицензия](#Лицензия)
 
-## Some features
+## Возможности
 
 фыв
 
-## Install
+## Установка
 
 1. [Git](https://git-scm.com/downloads)
 1. [Node.js](https://nodejs.org/en/)
 1. [install-tiny-tpl-engine.bat](https://github.com/lucifer63/tiny-tpl-engine/blob/master/install-tiny-tpl-engine.bat) ([raw](https://raw.githubusercontent.com/lucifer63/tiny-tpl-engine/master/install-tiny-tpl-engine.bat))
 
-## Usage
+## Запуск
 
 Запуск *tiny-tpl-engine* пока что производится с помощью [run_tpl.bat](https://github.com/lucifer63/tiny-tpl-engine/blob/master/run_tpl.bat).
 
-## Tools
+## Инструменты
 
 Tiny-tpl-engine использует:
 
@@ -33,7 +33,7 @@ Tiny-tpl-engine использует:
 * [Juice](https://github.com/Automattic/juice) - Инлайн CSS с учетом порядка и приоритета правил,,
 * [mkdirp](https://github.com/substack/node-mkdirp) - Создание вложенных директорий.
 
-## Author
+## Автор
 
 **Polevoy Nikita** - [lucifer63](https://github.com/lucifer63)
 
