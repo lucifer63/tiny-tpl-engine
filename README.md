@@ -116,7 +116,8 @@ User friendly usage process is still in development too, but at the time tiny-tp
 Tiny-tpl-engine uses:
 
 * [Cheerio](https://github.com/cheeriojs/cheerio) - Creation of an XML/HTML document with a jQuery interface,
-* [Juice](https://github.com/Automattic/juice) - Inlining CSS with respect to order and rules priority.
+* [Juice](https://github.com/Automattic/juice) - Inlining CSS with respect to order and rules priority,
+* [mkdirp](https://github.com/substack/node-mkdirp) - Creation of nested directories.
 
 Many thanks to guys who created these awesome tools!
 
