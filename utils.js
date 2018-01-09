@@ -4,15 +4,16 @@ global.utils = {};
 var self = utils;
 
 (function() {
-	global.ignite = function( fuse ) {
-		var end_of_the_wick, f;
+	global.ignite = function( fuse, system ) {
+		var end_of_the_wick, f,
+			wrapper = system ? system_function_wrapper : function_wrapper;
 
 		if (fuse[0] instanceof Array) {
-			end_of_the_wick = Promise.all( fuse[0].map(function_wrapper) );
+			end_of_the_wick = Promise.all( fuse[0].map(wrapper) );
 		} else if  (typeof fuse[0] === 'object') {
-			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(function_wrapper) );	
+			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(wrapper) );	
 		} else if (typeof fuse[0] === 'function') {
-			end_of_the_wick = function_wrapper(fuse[0]);
+			end_of_the_wick = wrapper(fuse[0]);
 		} else {
 			throw new Error('Array passed to ignite should only contain arrays, object or functions!');
 		}
@@ -20,15 +21,15 @@ var self = utils;
 		for (let i = 1; i < fuse.length; i++) {
 			if (fuse[i] instanceof Array) {
 				f = function() {
-					return Promise.all( fuse[i].map(function_wrapper) );
+					return Promise.all( fuse[i].map(wrapper) );
 				}			
 			} else if  (typeof fuse[i] === 'object') {
 				f = function() {
-					return Promise.all( Object.values( fuse[i] ).map(function_wrapper) );	
+					return Promise.all( Object.values( fuse[i] ).map(wrapper) );	
 				}			
 			} else if (typeof fuse[i] === 'function') {
 				f = function() {
-					return function_wrapper(fuse[i]);
+					return wrapper(fuse[i]);
 				}
 			} else {
 				throw new Error('Array passed to ignite should only contain arrays, object or functions!');
@@ -40,7 +41,7 @@ var self = utils;
 		return end_of_the_wick;
 	};
 
-	function function_wrapper(f) {
+	function system_function_wrapper(f) {
 		return new Promise((main_res, main_rej) => {
 			console.log(`Starting procedure "${ f.name }"`);
 			return new Promise(f)
@@ -50,6 +51,16 @@ var self = utils;
 				})
 				.catch((reason) => {
 					console.log(`Procedure "${ f.name }" has failed!`);
+					main_rej(reason);
+				});
+		});
+	}
+
+	function function_wrapper(f) {
+		return new Promise((main_res, main_rej) => {
+			return new Promise(f)
+				.then(main_res)
+				.catch((reason) => {
 					main_rej(reason);
 				});
 		});

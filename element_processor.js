@@ -64,7 +64,7 @@ Object.assign(self, {
 
 					$transfer.find('if').each(function(i, elem) {
 						var $if = $( elem ), 
-							condition = $if.attr('condition');
+						condition = $if.attr('condition');
 
 						try {
 							if (self.evalCondition.call($initial_element, condition)) {
@@ -79,7 +79,7 @@ Object.assign(self, {
 
 					$transfer.find('[condition]').each(function(i, elem) {
 						var $this = $( elem ), 
-							condition = $this.attr('condition');
+						condition = $this.attr('condition');
 
 						try {
 							if (self.evalCondition.call($initial_element, condition)) {
@@ -98,8 +98,8 @@ Object.assign(self, {
 	styleToAttributes: function( $ ) {
 		$( '[style]' ).each(function(i, elem) {
 			var $elem = $( elem ),
-				styles = $elem.attr('style').split(';'),
-				current_attr;
+			styles = $elem.attr('style').split(';'),
+			current_attr;
 
 			for (var i = 0; i < styles.length - 1; i++) {
 				styles[i] = styles[i].trim().split(':');
@@ -155,13 +155,13 @@ Object.assign(self, {
 	})(),
 	parseValue: function(input, node, counters, $) {
 		var input = self.parseSpaceSeparatedString(input),
-			current,
-			attr,
-			initial = '',
-			output = '',
-			counter,
-			lvl = node.data('lvl'),
-			index;
+		current,
+		attr,
+		initial = '',
+		output = '',
+		counter,
+		lvl = node.data('lvl'),
+		index;
 
 		for (var i = 0; i < input.length; i++) {
 			current = input[i];
@@ -216,7 +216,7 @@ Object.assign(self, {
 	},
 	replaceTag(node, tag_name, $) {
 		var transfer = $("<" + tag_name + ">" + node.html() + "</" + tag_name + ">"),
-			attributes = node.attr();
+		attributes = node.attr();
 
 		for (var key in attributes) {
 			transfer.attr(key, attributes[key]);
@@ -230,10 +230,10 @@ Object.assign(self, {
 	},
 	resetCounter: function(node, counters, $) {
 		var counter_reset = node.attr('counter-reset'),
-			index_of_first_space = -1,
-			name,
-			value,
-			lvl = node.data('lvl');
+		index_of_first_space = -1,
+		name,
+		value,
+		lvl = node.data('lvl');
 
 		if (counter_reset) {
 
@@ -272,12 +272,12 @@ Object.assign(self, {
 	},
 	incrementCounter: function(node, counters, $) {
 		var counter_increment = node.attr('counter-increment'),
-			index_of_first_space = -1,
-			name,
-			value,
-			counter,
-			lvl = node.data('lvl'),
-			index;
+		index_of_first_space = -1,
+		name,
+		value,
+		counter,
+		lvl = node.data('lvl'),
+		index;
 
 		if (counter_increment) {
 			counter_increment = counter_increment.split(',');
@@ -327,9 +327,9 @@ Object.assign(self, {
 	},
 	modifyAttribute: function(node, counters, $) {
 		var modify_attribute = node.attr('modify-attribute'),
-			index_of_first_space = -1,
-			name,
-			value;
+		index_of_first_space = -1,
+		name,
+		value;
 
 		if (modify_attribute) {
 			modify_attribute = modify_attribute.split(',');
@@ -357,8 +357,8 @@ Object.assign(self, {
 	},
 	modifyContent: function(node, counters, $) {
 		var modify_content = node.attr('modify-content'),
-			name,
-			value;
+		name,
+		value;
 
 		if (modify_content) {
 			modify_content = modify_content.trim();
@@ -371,8 +371,8 @@ Object.assign(self, {
 	},
 	modifyTag: function(node, counters, $) {
 		var modify_tag = node.attr('modify-tag'),
-			name,
-			value;
+		name,
+		value;
 
 		if (modify_tag) {
 			value = modify_tag.trim();
@@ -386,8 +386,8 @@ Object.assign(self, {
 	},
 	removeAttribute: function(node, counters, $) {
 		var modify_attribute = node.attr('remove-attribute'),
-			name,
-			value;
+		name,
+		value;
 
 		if (modify_attribute) {
 			modify_attribute = modify_attribute.split(',');
@@ -424,17 +424,28 @@ Object.assign(self, {
 			self.applyCounters( $(elem), counters, $, lvl + 1 );
 		})
 	},
-	executeScripts: function($) {
-		try {
+	executeScripts: function($, filename) {
+		function scriptEvaluator( code ) {
+			return function(finish_script, reject_script) {
+				try {
+					eval( code );
+				} catch(e) {
+					e.message = `Error occured during execution of "${ filename }" script: ${ e.message }`;
+					reject_script(e);
+					throw e;
+				}
+			};
+		};
+
+		return new Promise(function(res, rej) {
+			var i = 0,
+				scripts_array = new Array( utils.scripts.size );
+
 			for (var filename of utils.scripts.keys()) {
-				eval(utils.scripts.get(filename));
+				scripts_array[ i++ ] = scriptEvaluator( utils.scripts.get(filename) );
 			}
-		} catch(e) {
-			e.message = `Error occured during execution of "${ filename }" script: ` + e.message;
-			throw e;
-		}
+
+			ignite([ scripts_array ]).then(res);
+		});
 	}
 });
-
-
-

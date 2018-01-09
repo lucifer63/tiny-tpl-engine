@@ -99,13 +99,9 @@ All the examples can be found in `Data` folder in this project.
 
 ## Install
 
-This little app uses [node](http://nodejs.org) and [npm](https://npmjs.com). Installation process is still in development, sorry. At the moment it can be installed this way: 
-
-```cmd
-git clone https://github.com/lucifer63/tiny-tpl-engine
-cd tiny-tpl-engine
-npm install
-```
+1. [Git](https://git-scm.com/downloads)
+1. [Node.js](https://nodejs.org/en/)
+1. [install-tiny-tpl-engine.bat](https://github.com/lucifer63/tiny-tpl-engine/blob/master/install-tiny-tpl-engine.bat) ([raw](https://raw.githubusercontent.com/lucifer63/tiny-tpl-engine/master/install-tiny-tpl-engine.bat))
 
 ## Usage
 
