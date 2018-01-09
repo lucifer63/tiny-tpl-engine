@@ -1,6 +1,6 @@
 # tiny-tpl-engine
 
-*Tiny-tpl-engine* это простой XML шаблонизатор. Особенности: XML синтаксис, логика в шаблонах, инлайн CSS свойств в атрибуты и кастомные CSS свойства для изменения контента, тега и атрибутов элементов. Управляющие свойства пока что в разработке.
+*Tiny-tpl-engine* это простой XML шаблонизатор. Особенности: XML синтаксис, логика в шаблонах, асинхронное выполнение пользовательских скриптов, инлайн CSS свойств в атрибуты и кастомные CSS свойства для изменения контента, тега и атрибутов элементов. Управляющие свойства пока что в разработке.
 
 ## Table of Contents
 
@@ -13,7 +13,72 @@
 
 ## Возможности
 
-фыв
+1. Собственно, подстановка шаблонов: 
+
+Шаблон:
+```html
+<!-- templates/test.tpl -->
+<div>
+    <span>My first template</span>
+    <p>{content}</p>
+</div>
+```
+Исходный код:
+```html
+<!-- raw/document.xml -->
+<test>Very important content</test>
+```
+Конечный код:
+```html
+<!-- processed/document.xml -->
+<div>
+    <span>My first template</span>
+    <p>Very important content</p>
+</div>
+```
+2. Логика в шаблоне:
+Шаблон:
+```html
+<!-- templates/test.tpl -->
+<div>
+    <span condition="this.attr('show') === 'false'">My first template</span>
+    <if condition="this.attr('show') === 'true'">
+        <span>Visible only if 'show' attribute is 'true'</span>
+        <span>This one too</span>
+    </if>
+    <p>{content}</p>
+</div>
+```
+Исходный код:
+```html
+<!-- raw/document.xml -->
+<test>Doesn't have 'show' attribute</test>
+
+<test show="true">Has 'show' attribute</test>
+```
+Конечный код:
+```html
+<!-- processed/document.xml -->
+<div>
+    <p>Doesn't have 'show' attribute</p>
+</div>
+
+<div>
+    <span>Visible only if 'show' attribute is 'true'</span>
+    <span>This one too</span>
+    <p>Has 'show' attribute</p>
+</div>
+```
+***Содержимое атрибута `condition` выполняется в глобальном контексте как JS с помощью [eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval)!***
+3. [CSS-counters](https://habrahabr.ru/post/49500/) и управление исходным кодом элемента с помощью CSS:
+    1. `counter-reset: counter_name[ value(counter_value)];` - создаёт экземпляр счётчика с именем `counter_name`. Исходное значение счетчика указывается с помощью `value()`, например счетчик `counter` со значением `"some text"` создаётся так: `counter-reset: counter value("some text");`. Если значение не указано, то по умолчанию счетчик имеет числовой тип и инициализируется со значением *0*. Значение `value()` может содержать строки, ключевые слова и функции. В данный момент поддерживаются всего две функции:
+        1. `attr(attribute_name)` - возвращает значение атрибута `attribute_name` текущего элемента,
+        2. `counter(counter_name)` - возвращает значение того экземпляра счетчика с именем `counter_name`, который доступен для текущего элемента.
+    2. `counter-increment: counter_name[ value(counter_value)];` - устанавливает значение счетчика с именем `counter_name`. Если значение не указано, то счетчик считается числовым и увеличивается на 1,
+    3. `modify-attribute: attr_name value(attr_value);` - устанавливает значение атрибута с именем `attr_name` текущего элемента. Ключевое слово `attr` может быть использовано для доступа к текущему значению атрибута,
+    4. `modify-content: new_value;` - устанавливает контент текущего элемента. `new_value` это строка со значениями разделенными пробелом. Ключевое слово `content` может быть использовано для доступа к текущему контенту элемента,
+    5. `modify-tag: new_tagname;` - устанавливает имя тега для текущего элемента. `new_tagname` это строка со значениями разделенными пробелом. Ключевое слово `tag` может быть использовано для доступа к текущему имени тега элемента,
+    6. `remove-attributes: attribute;` - удаляет атрибут `attribute` текущего элемента.
 
 ## Установка
 
@@ -35,8 +100,8 @@ Tiny-tpl-engine использует:
 
 ## Автор
 
-**Polevoy Nikita** - [lucifer63](https://github.com/lucifer63)
+**Полевой Никита** - [lucifer63](https://github.com/lucifer63)
 
 ## Лицензия
 
-[MIT](LICENSE) © Polevoy Nikita
+[MIT](LICENSE) © Полевой Никита
