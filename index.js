@@ -77,7 +77,6 @@ function readTemplates(finish, abort) {
 }
 
 function readAndProcessXMLFiles(finish, abort) {
-	utils.log('Starting to readAndProcessXMLFiles.')
 	var dirname = project_folder + '\\' + config.folders.raw;
 
 	if (!utils.fs.existsSync(dirname)) {
@@ -93,14 +92,12 @@ function readAndProcessXMLFiles(finish, abort) {
 			for (var filename of files.keys()) {
 				utils.xml_trees[ filename.split('.')[0] ] = utils.cheerio.load( files.get(filename), { xmlMode: true, decodeEntities: false });
 			}
-			utils.log('Finished procedure readAndProcessXMLFiles.');
 			return finish();
 		}
 	});
 }
 
 function readStyles(finish, abort) {
-	utils.log('Starting to readStyles.')
 	var dirname = project_folder + '\\' + config.folders.styles;
 
 	if (!utils.fs.existsSync(dirname)) {
@@ -121,7 +118,6 @@ function readStyles(finish, abort) {
 						utils.style += files.get(filename) + '\n';	
 					}
 				}
-				utils.log('Finished procedure readStyles.');
 				return finish();
 			}
 		};
@@ -136,7 +132,6 @@ function readStyles(finish, abort) {
 }
 
 function readScripts(finish, abort) {
-	utils.log('Starting to readScripts.')
 	var dirname = project_folder + '\\' + config.folders.scripts;
 
 	if (!utils.fs.existsSync(dirname)) {
@@ -153,7 +148,6 @@ function readScripts(finish, abort) {
 					return finish();
 				}
 				utils.scripts = files;
-				utils.log('Finished procedure readScripts.');
 				return finish();
 			}
 		};
@@ -168,37 +162,29 @@ function readScripts(finish, abort) {
 }
 
 function applyTemplates(finish, abort) {
-	utils.log('Starting to applyTemplates.')
 	for (var tree in utils.xml_trees) {
 		element_processor.applyTemplates( utils.xml_trees[ tree ] );
 	}
 	delete utils.templates;
-	utils.log('Finished procedure applyTemplates.');
 	return finish();
 }
 
 function inlineStyles(finish, abort) {
-	utils.log('Starting to inlineStyles.')
 	for (var tree in utils.xml_trees) {
 		utils.juice.inlineDocument( utils.xml_trees[tree], utils.style);
 		element_processor.styleToAttributes( utils.xml_trees[ tree ] );
 	}
-	utils.log('Finished procedure inlineStyles.');
 	return finish();
 }
 
 function applyCounters(finish, abort) {
-	utils.log('Starting to applyCounters.')
 	for (var tree in utils.xml_trees) {
 		element_processor.applyCounters( utils.xml_trees[tree].root(), {}, utils.xml_trees[tree] );
 	}
-	utils.log('Finished procedure applyCounters.');
 	return finish();
 }
 
 function executeScripts(finish, abort) {
-	utils.log('Starting to executeScripts.')
-
 	//console.log( utils.xml_trees.paragraph_20.html() );
 
 	//var scripts_promise_array = utils.scripts.map();
@@ -224,12 +210,10 @@ function executeScripts(finish, abort) {
 	}
 	// global_scripts_promise.then(function() {		
 	// })
-	utils.log('Finished procedure executeScripts.');
 	return finish();
 }
 
 function saveFiles(finish, abort) {
-	utils.log('Starting to saveFiles.')
 	for (var tree in utils.xml_trees) {
 		utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
 	}
@@ -238,7 +222,6 @@ function saveFiles(finish, abort) {
 		dirname: project_folder + '\\' + config.folders.processed,
 		file_object: utils.xml_trees,
 		callback: () => {
-			utils.log('Finished procedure saveFiles.');
 			return finish();
 		}
 	});

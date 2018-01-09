@@ -3,42 +3,58 @@
 global.utils = {};
 var self = utils;
 
+(function() {
+	global.ignite = function( fuse ) {
+		var end_of_the_wick, f;
 
-global.ignite = function( fuse ) {
-	var end_of_the_wick, f;
-
-	if (fuse[0] instanceof Array) {
-		end_of_the_wick = Promise.all( fuse[0].map(f => new Promise(f)) );
-	} else if  (typeof fuse[0] === 'object') {
-		end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(f => new Promise(f)) );	
-	} else if (typeof fuse[0] === 'function') {
-		end_of_the_wick = new Promise(fuse[0]);
-	} else {
-		throw new Error('Array passed to ignite should only contain arrays, object or functions!');
-	}
-
-	for (let i = 1; i < fuse.length; i++) {
-		if (fuse[i] instanceof Array) {
-			f = function() {
-				return Promise.all( fuse[i].map(f => new Promise(f)) );
-			}			
-		} else if  (typeof fuse[i] === 'object') {
-			f = function() {
-				return Promise.all( Object.values( fuse[i] ).map(f => new Promise(f)) );	
-			}			
-		} else if (typeof fuse[i] === 'function') {
-			f = function() {
-				return new Promise(fuse[i]);
-			}
+		if (fuse[0] instanceof Array) {
+			end_of_the_wick = Promise.all( fuse[0].map(function_wrapper) );
+		} else if  (typeof fuse[0] === 'object') {
+			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(function_wrapper) );	
+		} else if (typeof fuse[0] === 'function') {
+			end_of_the_wick = function_wrapper(fuse[0]);
 		} else {
 			throw new Error('Array passed to ignite should only contain arrays, object or functions!');
 		}
 
-		end_of_the_wick = end_of_the_wick.then(f);
-	}
+		for (let i = 1; i < fuse.length; i++) {
+			if (fuse[i] instanceof Array) {
+				f = function() {
+					return Promise.all( fuse[i].map(function_wrapper) );
+				}			
+			} else if  (typeof fuse[i] === 'object') {
+				f = function() {
+					return Promise.all( Object.values( fuse[i] ).map(function_wrapper) );	
+				}			
+			} else if (typeof fuse[i] === 'function') {
+				f = function() {
+					return function_wrapper(fuse[i]);
+				}
+			} else {
+				throw new Error('Array passed to ignite should only contain arrays, object or functions!');
+			}
 
-	return end_of_the_wick;
-};
+			end_of_the_wick = end_of_the_wick.then(f);
+		}
+
+		return end_of_the_wick;
+	};
+
+	function function_wrapper(f) {
+		return new Promise((main_res, main_rej) => {
+			console.log(`Starting procedure "${ f.name }"`);
+			return new Promise(f)
+				.then(() => {
+					console.log(`Finished procedure "${ f.name }"`);
+					main_res();
+				})
+				.catch((reason) => {
+					console.log(`Procedure "${ f.name }" has failed!`);
+					main_rej(reason);
+				});
+		});
+	}
+})();
 
 Object.assign(RegExp, {
 	empty_lines:		/^\s*[\r\n]/gm,
