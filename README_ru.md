@@ -70,6 +70,7 @@
 </div>
 ```
 ***Содержимое атрибута `condition` выполняется в глобальном контексте как JS с помощью [eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval)!***
+
 3. [CSS-counters](https://habrahabr.ru/post/49500/) и управление исходным кодом элемента с помощью CSS:
     1. `counter-reset: counter_name[ value(counter_value)];` - создаёт экземпляр счётчика с именем `counter_name`. Исходное значение счетчика указывается с помощью `value()`, например счетчик `counter` со значением `"some text"` создаётся так: `counter-reset: counter value("some text");`. Если значение не указано, то по умолчанию счетчик имеет числовой тип и инициализируется со значением *0*. Значение `value()` может содержать строки, ключевые слова и функции. В данный момент поддерживаются всего две функции:
         1. `attr(attribute_name)` - возвращает значение атрибута `attribute_name` текущего элемента,
