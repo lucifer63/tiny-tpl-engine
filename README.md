@@ -31,7 +31,7 @@ At the moment tiny-tpl-engine is capable of:
 </div>
 ```
 
-Then you have to create an XML/HTML file that will be processed by tiny-tpl-engine. Currently there is no option to change name of a directory that contains raw *ML files, the app will take files from `Data\articles_raw` directory. If we create `Data\articles_raw\document.xml` file with this code:
+Then you have to create an XML/HTML file that will be processed by tiny-tpl-engine. Currently there is no option to change name of a directory that contains raw *ML files, the app will take files from `Data\raw` directory. If we create `Data\raw\document.xml` file with this code:
 
 ```html
 <test>Very important content</test>
@@ -45,7 +45,7 @@ Then you have to create an XML/HTML file that will be processed by tiny-tpl-engi
     <p>Very important content</p>
 </div>
 ```
-...and will get saved in `Data\articles` directory with the same name: `Data\articles\document.xml`.
+...and will get saved in `Data\processed` directory with the same name: `Data\processed\document.xml`.
 
 The engine supports nested templates but unfortunately at the moment it can't handle circular references in templates and will just crash, sorry.
 
@@ -62,7 +62,7 @@ Also, the engine can handle template logic in two ways: individually or by group
 </div>
 ```
 
-...and this `Data\articles_raw\document.xml`:
+...and this `Data\raw\document.xml`:
 
 ```html
 <test>Doesn't have 'show' attribute</test>

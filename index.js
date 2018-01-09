@@ -3,7 +3,7 @@
 require('.//utils.js');
 
 const 	resolve 		= require('path').resolve,
-		default_folders	= [ "styles", "scripts", "templates", "configs", "articles_raw", "articles" ];
+		default_folders	= [ "styles", "scripts", "templates", "configs", "raw", "processed" ];
 
 utils.fs		= require('fs');
 utils.cheerio	= require('cheerio');
@@ -78,7 +78,7 @@ function readTemplates(finish, abort) {
 
 function readAndProcessXMLFiles(finish, abort) {
 	utils.log('Starting to readAndProcessXMLFiles.')
-	var dirname = project_folder + '\\' + config.folders.articles_raw;
+	var dirname = project_folder + '\\' + config.folders.raw;
 
 	if (!utils.fs.existsSync(dirname)) {
 		return abort(`There is no "${ dirname }" directory!`);
@@ -235,7 +235,7 @@ function saveFiles(finish, abort) {
 	}
 
 	utils.saveFiles({
-		dirname: project_folder + '\\' + config.folders.articles,
+		dirname: project_folder + '\\' + config.folders.processed,
 		file_object: utils.xml_trees,
 		callback: () => {
 			utils.log('Finished procedure saveFiles.');

@@ -25,10 +25,10 @@ module.exports = function(grunt) {
 			},
 			all: {
 				expand: true,
-				cwd: path + '\\' + tpl_config.folders.articles,
+				cwd: path + '\\' + tpl_config.folders.processed,
 				ext: '.xml',
 				src: ['*.xml'],
-				dest: path + '\\' + tpl_config.folders.articles
+				dest: path + '\\' + tpl_config.folders.processed
 			}
 		}
 	});
