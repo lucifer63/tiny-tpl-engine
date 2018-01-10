@@ -3,6 +3,11 @@
 global.element_processor = {};
 var self = element_processor;
 
+Object.assign(RegExp, {
+	content_marker:		/{content}/g,
+	attribute_keyword:	/\battribute\b/g
+});
+
 utils.cheerio.prototype.eachTextNode = function(processor, callback) {
 	var textNodes = this.contents().filter(function() {
 		return this.type === 'text';
@@ -166,7 +171,7 @@ Object.assign(self, {
 		for (var i = 0; i < input.length; i++) {
 			current = input[i];
 
-			if (current.indexOf('attr') !== -1) {
+			if (current.startsWith('attr')) {
 				attr = self.parseCSSFunctionStringAs( 'attr', current )
 				current = node.attr( attr );
 				if (typeof current !== typeof undefined && current !== false) {
@@ -176,7 +181,7 @@ Object.assign(self, {
 				}
 			} else if (current === 'content') {
 				output += node.html();
-			} else if (current.indexOf('counter') !== -1) {
+			} else if (current.startsWith('counter')) {
 				current = self.parseCSSFunctionStringAs( 'counter', current )
 
 				/* processing counter s */
@@ -206,7 +211,8 @@ Object.assign(self, {
 		return output;
 	},
 	parseCSSFunctionStringAs(type, input) {
-		var beginning = type + '(', result;
+		var beginning = type + '(',
+			result;
 
 		if (input.substr(0, beginning.length) === beginning && input[input.length - 1] === ')') {
 			return input.substring(beginning.length, input.length - 1);
@@ -347,7 +353,7 @@ Object.assign(self, {
 				name = modify_attribute[i][0];
 
 				value = self.parseCSSFunctionStringAs( 'value', modify_attribute[i][1] );
-				value = value.replace(RegExp.single_attr, '\'' + node.attr(name) + '\'');
+				value = value.replace(RegExp.attribute_keyword, '\'' + node.attr(name) + '\'');
 				value = self.parseValue( value, node, counters, $ );
 
 				node.attr(name, value);

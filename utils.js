@@ -69,10 +69,8 @@ var self = utils;
 
 Object.assign(RegExp, {
 	empty_lines:		/^\s*[\r\n]/gm,
-	spaces:				/\s+/g,
-	content_marker:		/{content}/g,
-	single_attr:		/attr(?!\()/g
-})
+	spaces:				/\s+/g
+});
 
 Array.prototype.last = function() {	
 	return this[this.length - 1];

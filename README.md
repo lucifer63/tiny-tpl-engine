@@ -92,7 +92,7 @@ The content of `condition` attribute is raw JS, be careful!
         1. `attr(attribute_name)` - returns a value of an attribute specified by name,
         2. `counter(counter_name)` - returns a value of a corresponding counter,
     2. `counter-increment: counter_name[ value(counter_value)][, ...]` - increments a corresponding counter instance. If no value is provided then counter is treated like a number and incremented by 1. Otherwise, the value will get assigned to a corresponding counter,
-    3. `modify-attribute: attr_name value(attr_value)[, ...]` - modifies an attribute specified by a name. `attr` keyword can be used in `attr_value` to get current value of an attribute,
+    3. `modify-attribute: attr_name value(attr_value)[, ...]` - modifies an attribute specified by a name. `attribute` keyword can be used in `attr_value` to get current value of an attribute,
     4. `modify-content: new_value` - modifies content of an element. `new_value` is a string with a values separated by spaces, the same as `counter_value` and `attr_value`. `content` keyword can be used in `new_value` to get current content of an element,
     5. `modify-tag: new_tagname` - modifies tagname of an element. `new_tagname` is a string with a values separated by spaces, the same as `counter_value` and `attr_value`. `tag` keyword can be used in `new_tagname` to get current tagname of an element,
     6. `remove-attributes: attribute[, ...[, attributeN]]` - removes attributes of an element. `attribute` is a name of attribute.
