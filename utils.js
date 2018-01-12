@@ -10,7 +10,7 @@ var self = utils;
 
 		if (fuse[0] instanceof Array) {
 			end_of_the_wick = Promise.all( fuse[0].map(wrapper) );
-		} else if  (typeof fuse[0] === 'object') {
+		} else if (typeof fuse[0] === 'object') {
 			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(wrapper) );	
 		} else if (typeof fuse[0] === 'function') {
 			end_of_the_wick = wrapper(fuse[0]);
@@ -23,7 +23,7 @@ var self = utils;
 				f = function() {
 					return Promise.all( fuse[i].map(wrapper) );
 				}			
-			} else if  (typeof fuse[i] === 'object') {
+			} else if (typeof fuse[i] === 'object') {
 				f = function() {
 					return Promise.all( Object.values( fuse[i] ).map(wrapper) );	
 				}			
@@ -43,8 +43,14 @@ var self = utils;
 
 	function system_function_wrapper(f) {
 		return new Promise((main_res, main_rej) => {
+			utils.step = f.name;
 			console.log(`Starting procedure "${ f.name }"`);
-			return new Promise(f)
+			return new Promise(function(res, rej) {
+					if (utils.script_steps.indexOf(f.name) !== -1) {
+						var scripts_promise = new Promise(element_processor.executeScriptsForCurrentStep);
+					}
+					return (scripts_promise ? scripts_promise.then(new Promise(f)) : new Promise(f)).then(res);
+				})
 				.then(() => {
 					console.log(`Finished procedure "${ f.name }"`);
 					main_res();

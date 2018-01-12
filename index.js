@@ -5,14 +5,21 @@ require('.//utils.js');
 const 	resolve 		= require('path').resolve,
 		default_folders	= [ "styles", "scripts", "templates", "configs", "raw", "processed" ];
 
-utils.fs		= require('fs');
-utils.cheerio	= require('cheerio');
-utils.juice		= require('juice');
-utils.mkdirp	= require('mkdirp');
-utils.templates	= {};
-utils.xml_trees	= {};
-utils.style		= '';
-utils.scripts	= {};
+utils.fs			= require('fs');
+utils.cheerio		= require('cheerio');
+utils.juice			= require('juice');
+utils.mkdirp		= require('mkdirp');
+utils.templates		= {};
+utils.xml_trees		= {};
+utils.style			= '';
+utils.scripts		= {};
+utils.script_steps	= [ 
+	"init",
+	"applyTemplates",
+	"inlineStyles",
+	"applyCounters",
+	"saveFiles",
+];
 
 require('.//element_processor.js');
 
@@ -43,10 +50,11 @@ for (var folder of default_folders) {
 
 ignite([
 	[ readTemplates, readAndProcessXMLFiles, readStyles, readScripts ],
+	divideScriptsBySteps,
+	init,
 	applyTemplates,
 	inlineStyles,
 	applyCounters,
-	executeScripts,
 	saveFiles
 ], true);
 
@@ -161,6 +169,36 @@ function readScripts(finish, abort) {
 	}
 }
 
+function divideScriptsBySteps(finish, abort) {
+	var step_reg = /^\s*\/\*\s*step:\s*([a-z]*?)\s*\*\//i,
+		scripts = utils.scripts;
+
+	utils.scripts = {};
+
+	utils.script_steps.forEach(function(step) {
+		utils.scripts[ step ] = new Map();
+	});
+
+	scripts.forEach(function(code, filename) {
+		var step = step_reg.exec( code );
+
+		if (step && utils.script_steps.indexOf(step[1]) !== -1) {
+			step = step[1];
+		} else {
+			step = utils.script_steps.last();
+		}
+
+		utils.scripts[ step ].set(filename, code);
+	});
+
+	return finish();
+}
+
+function init(finish, abort) {
+	/* just a placeholder function to execute scripts bound to step:init */
+	return finish();
+}
+
 function applyTemplates(finish, abort) {
 	for (var tree in utils.xml_trees) {
 		element_processor.applyTemplates( utils.xml_trees[ tree ] );
@@ -182,21 +220,6 @@ function applyCounters(finish, abort) {
 		element_processor.applyCounters( utils.xml_trees[tree].root(), {}, utils.xml_trees[tree] );
 	}
 	return finish();
-}
-
-function executeScripts(finish, abort) {
-	if (utils.scripts && utils.scripts.size) {
-		var i = 0,
-			document_scripts_array = new Array( utils.xml_trees.length );
-
-		for (var tree in utils.xml_trees) {
-			document_scripts_array[ i++ ] = element_processor.executeScripts(utils.xml_trees[tree], tree);
-		}
-
-		Promise.all(document_scripts_array).then(finish);
-	} else {
-		finish();
-	}
 }
 
 function saveFiles(finish, abort) {
