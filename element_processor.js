@@ -391,17 +391,17 @@ Object.assign(self, {
 		return node;
 	},
 	removeAttribute: function(node, counters, $) {
-		var modify_attribute = node.attr('remove-attribute'),
+		var remove_attribute = node.attr('remove-attribute'),
 			name,
 			value;
 
-		if (modify_attribute) {
-			modify_attribute = modify_attribute.split(',');
+		if (remove_attribute) {
+			remove_attribute = remove_attribute.split(',');
 
-			for (var i = 0; i < modify_attribute.length; i++) {
-				node.removeAttr( modify_attribute[i].trim() )
+			for (var i = 0; i < remove_attribute.length; i++) {
+				node.removeAttr( remove_attribute[i].trim() )
 			}
-			
+
 			node.removeAttr('remove-attribute');
 		}
 	},
