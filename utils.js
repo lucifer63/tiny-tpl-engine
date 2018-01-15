@@ -11,7 +11,7 @@ var self = utils;
 		if (fuse[0] instanceof Array) {
 			end_of_the_wick = Promise.all( fuse[0].map(wrapper) );
 		} else if (typeof fuse[0] === 'object') {
-			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(wrapper) );	
+			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(wrapper) );
 		} else if (typeof fuse[0] === 'function') {
 			end_of_the_wick = wrapper(fuse[0]);
 		} else {
@@ -22,11 +22,11 @@ var self = utils;
 			if (fuse[i] instanceof Array) {
 				f = function() {
 					return Promise.all( fuse[i].map(wrapper) );
-				}			
+				}
 			} else if (typeof fuse[i] === 'object') {
 				f = function() {
-					return Promise.all( Object.values( fuse[i] ).map(wrapper) );	
-				}			
+					return Promise.all( Object.values( fuse[i] ).map(wrapper) );
+				}
 			} else if (typeof fuse[i] === 'function') {
 				f = function() {
 					return wrapper(fuse[i]);
@@ -78,7 +78,7 @@ Object.assign(RegExp, {
 	spaces:				/\s+/g
 });
 
-Array.prototype.last = function() {	
+Array.prototype.last = function() {
 	return this[this.length - 1];
 }
 
@@ -145,20 +145,20 @@ Object.assign(self, {
 			processed = 0;
 
 		utils.mkdirp(options.dirname, function(err) {
-			if (err) { 
-				utils.throwErr(err); 
-				return; 
-			} 
+			if (err) {
+				utils.throwErr(err);
+				return;
+			}
 			for (var filename in options.file_object) {
 				self.fs.writeFile(options.dirname + '\\' + filename + '.xml', options.file_object[ filename ], function(err) {
-					if (err) { 
-						utils.throwErr(err); 
-						return; 
-					} 
+					if (err) {
+						utils.throwErr(err);
+						return;
+					}
 					processed++;
-					if (files_amount === processed && typeof options.callback === 'function') { 
-						options.callback(); 
-					} 
+					if (files_amount === processed && typeof options.callback === 'function') {
+						options.callback();
+					}
 				});
 			}
 		})
@@ -168,33 +168,40 @@ Object.assign(self, {
 		var processed = 0,
 			files = new Map();
 
-		options.files.forEach(function(filename, i) { 
-			files.set(filename, i);
-			self.fs.readFile(options.dirname + '\\' + filename, 'utf-8', function(err, content) { 
-				if (err) {
-					utils.throwErr(err); 
-					return; 
-				} 
+		if (options.files.length) {
+			options.files.forEach(function(filename, i) {
+				files.set(filename, i);
+				self.fs.readFile(options.dirname + '\\' + filename, 'utf-8', function(err, content) {
+					if (err) {
+						utils.throwErr(err);
+						return;
+					}
 
-				files.set(filename, content);
-				
-				processed++;
-				if (options.files.length === processed && typeof options.callback === 'function') {
-					options.callback( files ); 
-				} 
-			}); 
-		}); 
+					files.set(filename, content);
+
+					processed++;
+
+					if (options.files.length === processed && typeof options.callback === 'function') {
+						options.callback( files );
+					}
+				});
+			});
+		} else {
+			if (typeof options.callback === 'function') {
+				options.callback( files );
+			}
+		}
 	},
 	// dirname, callback
 	readDir: function(options) {
-		self.fs.readdir(options.dirname, function(err, filenames) { 
-			if (err) { 
-				utils.throwErr(err); 
-				return; 
-			} 
+		self.fs.readdir(options.dirname, function(err, filenames) {
+			if (err) {
+				utils.throwErr(err);
+				return;
+			}
 
 			options.files = filenames;
 			utils.readFiles(options);
-		}); 
+		});
 	}
 });

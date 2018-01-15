@@ -12,13 +12,13 @@ page:not(:first-child) {
 
 table td:first-child img {
 	counter-increment: icons;
-	modify-attribute: url value(attr counter(chapter_color) "/"), url value(attr counter(icons) ".svg");
+	modify-attribute: url value(attribute counter(chapter_color) "/"), url value(attribute counter(icons) ".svg");
 }
 table[icon] {
 	counter-increment: current_icon value(attr(icon));
 }
 table[icon] td:nth-child(2) img {
-	modify-attribute: url value(attr counter(current_icon) ".svg");
+	modify-attribute: url value(attribute counter(current_icon) ".svg");
 }
 
 h1 {
@@ -27,5 +27,5 @@ h1 {
 
 chapter > image_block > img {
 	counter-increment: image;
-	modify-attribute: url value(attr counter(page) '-' counter(image) '.png');
+	modify-attribute: url value(attribute counter(page) '-' counter(image) '.png');
 }

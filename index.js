@@ -13,7 +13,7 @@ utils.templates		= {};
 utils.xml_trees		= {};
 utils.style			= '';
 utils.scripts		= {};
-utils.script_steps	= [ 
+utils.script_steps	= [
 	"init",
 	"applyTemplates",
 	"inlineStyles",
@@ -123,7 +123,7 @@ function readStyles(finish, abort) {
 				}
 				for (var filename of files.keys()) {
 					if (filename.slice(-extension.length) === extension) {
-						utils.style += files.get(filename) + '\n';	
+						utils.style += files.get(filename) + '\n';
 					}
 				}
 				return finish();
@@ -133,7 +133,7 @@ function readStyles(finish, abort) {
 	if (config.paths.styles && config.paths.styles instanceof Array) {
 		config.paths.styles = config.paths.styles.map(path => path.slice( - extension.length ) === extension ? path : path + extension)
 		options.files = config.paths.styles;
-		utils.readFiles( options )	
+		utils.readFiles( options )
 	} else {
 		utils.readDir( options );
 	}
@@ -163,7 +163,7 @@ function readScripts(finish, abort) {
 	if (config.paths.scripts && config.paths.scripts instanceof Array) {
 		config.paths.scripts = config.paths.scripts.map(path => path.slice( - extension.length ) === extension ? path : path + extension)
 		options.files = config.paths.scripts;
-		utils.readFiles( options )	
+		utils.readFiles( options )
 	} else {
 		utils.readDir( options );
 	}
@@ -179,17 +179,19 @@ function divideScriptsBySteps(finish, abort) {
 		utils.scripts[ step ] = new Map();
 	});
 
-	scripts.forEach(function(code, filename) {
-		var step = step_reg.exec( code );
+	if (scripts.size) {
+		scripts.forEach(function(code, filename) {
+			var step = step_reg.exec( code );
 
-		if (step && utils.script_steps.indexOf(step[1]) !== -1) {
-			step = step[1];
-		} else {
-			step = utils.script_steps.last();
-		}
+			if (step && utils.script_steps.indexOf(step[1]) !== -1) {
+				step = step[1];
+			} else {
+				step = utils.script_steps.last();
+			}
 
-		utils.scripts[ step ].set(filename, code);
-	});
+			utils.scripts[ step ].set(filename, code);
+		});
+	}
 
 	return finish();
 }
