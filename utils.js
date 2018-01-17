@@ -49,7 +49,7 @@ var self = utils;
 					if (utils.script_steps.indexOf(f.name) !== -1) {
 						var scripts_promise = new Promise(element_processor.executeScriptsForCurrentStep);
 					}
-					return (scripts_promise ? scripts_promise.then(new Promise(f)) : new Promise(f)).then(res);
+					return (scripts_promise ? scripts_promise.then(() => new Promise(f)) : new Promise(f)).then(res);
 				})
 				.then(() => {
 					console.log(`Finished procedure "${ f.name }"`);
