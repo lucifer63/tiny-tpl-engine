@@ -88,6 +88,9 @@ String.prototype.trim_empty_lines = function() {
 String.prototype.truncate = function(n) {
 	return (this.length > n) ? this.substr(0, n-1) + '...' : this;
 };
+String.prototype.normalizeSpaces = function() {
+	return this.replace(RegExp.spaces, ' ');
+};
 
 
 // native String.prototype.*With is very slow
