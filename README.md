@@ -16,12 +16,11 @@
 
 ## To do
 
+1. Pass regular errors to _ignite_,
 1. Catch circular references in templates,
 1. Implement [*@counter-style*](https://developer.mozilla.org/en-US/docs/Web/CSS/%40counter-style),
-1. Preserve template tag names at least till styling,
 1. Fix counters, [bug sample](https://jsfiddle.net/lucifer63/c4gvc66j/),
 1. Implement *$.findAndSeparateByLevel*,
-1. **Userscripts are not async right now! Next step begins after synchronous part of userscript!!!**.
 
 ## Some features
 

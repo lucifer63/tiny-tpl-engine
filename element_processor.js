@@ -414,17 +414,25 @@ Object.assign(self, {
 
 		utils.log('green', `applying to "${ $node.prop('tagName') }", lvl=${ lvl }`);
 
-		try {
-			self.resetCounter( $node, counters, $ );
-			self.incrementCounter( $node, counters, $ );
-			self.modifyAttribute( $node, counters, $ );
-			self.modifyContent( $node, counters, $ );
-			$node = self.modifyTag( $node, counters, $ );
-			self.removeAttribute( $node, counters, $ );
-		} catch (e) {
-			utils.log('red', $node.html());
-			throw e;
-		}
+		self.resetCounter( $node, counters, $ );
+		self.incrementCounter( $node, counters, $ );
+		self.modifyAttribute( $node, counters, $ );
+		self.modifyContent( $node, counters, $ );
+		$node = self.modifyTag( $node, counters, $ );
+		self.removeAttribute( $node, counters, $ );
+
+		// try {
+		// 	self.resetCounter( $node, counters, $ );
+		// 	self.incrementCounter( $node, counters, $ );
+		// 	self.modifyAttribute( $node, counters, $ );
+		// 	self.modifyContent( $node, counters, $ );
+		// 	$node = self.modifyTag( $node, counters, $ );
+		// 	self.removeAttribute( $node, counters, $ );
+		// } catch (e) {
+		// 	utils.log('red', $node.html());
+		// 	e.message = `Error occured during execution of "${ filename }" script: ${ e.message }`;
+		// 	throw e;
+		// }
 
 		$node.children().each(function(i, elem) {
 			self.applyCounters( $(elem), counters, $, lvl + 1 );
