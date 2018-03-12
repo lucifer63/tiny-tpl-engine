@@ -409,7 +409,7 @@ Object.assign(self, {
 		if (!lvl) {
 			lvl = 0;
 		}
-		
+
 		$node.data('lvl', lvl);
 
 		utils.log('green', `applying to "${ $node.prop('tagName') }", lvl=${ lvl }`);
@@ -421,18 +421,18 @@ Object.assign(self, {
 		$node = self.modifyTag( $node, counters, $ );
 		self.removeAttribute( $node, counters, $ );
 
-		// try {
-		// 	self.resetCounter( $node, counters, $ );
-		// 	self.incrementCounter( $node, counters, $ );
-		// 	self.modifyAttribute( $node, counters, $ );
-		// 	self.modifyContent( $node, counters, $ );
-		// 	$node = self.modifyTag( $node, counters, $ );
-		// 	self.removeAttribute( $node, counters, $ );
-		// } catch (e) {
-		// 	utils.log('red', $node.html());
-		// 	e.message = `Error occured during execution of "${ filename }" script: ${ e.message }`;
-		// 	throw e;
-		// }
+		 // try {
+		 	// self.resetCounter( $node, counters, $ );
+		 	// self.incrementCounter( $node, counters, $ );
+		 	// self.modifyAttribute( $node, counters, $ );
+		 	// self.modifyContent( $node, counters, $ );
+		 	// $node = self.modifyTag( $node, counters, $ );
+		 	// self.removeAttribute( $node, counters, $ );
+		 // } catch (e) {
+		 	// utils.log('red', $node.html());
+		 	// e.message = `Error occured during execution of "${ filename }" script: ${ e.message }`;
+		 	// throw e;
+		 // }
 
 		$node.children().each(function(i, elem) {
 			self.applyCounters( $(elem), counters, $, lvl + 1 );
