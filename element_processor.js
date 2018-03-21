@@ -297,6 +297,9 @@ Object.assign(self, {
 				
 				if (typeof counter_increment[i] === 'string') {
 					name = counter_increment[i];
+					if (name === 'none') {
+						continue;
+					}
 					value = 0;
 				} else {
 					name = counter_increment[i][0];
