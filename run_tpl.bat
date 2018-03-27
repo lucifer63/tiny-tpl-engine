@@ -1,5 +1,7 @@
 @echo off
 
+@cd/d "%~dp0"
+
 set OLDDIR=%CD%
 set OLDDRIVE=%~d0
 
