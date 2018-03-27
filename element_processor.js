@@ -5,6 +5,7 @@ var self = element_processor;
 
 Object.assign(RegExp, {
 	content_marker:		/{content}/g,
+	attr_marker:		/{attr:(.*?)}/g,
 	attribute_keyword:	/\battribute\b/g
 });
 
@@ -53,10 +54,23 @@ Object.assign(self, {
 				}
 
 				$elements.each(function(i, elem) {
-					var $initial_element = $( elem );
+					var $initial_element = $( elem ),
+						target_html = '';
 
-					$transfer = $( utils.templates[ tag_name ].replace(RegExp.content_marker, $(this).html() ).trim_empty_lines() );
-					
+					target_html = utils.templates[ tag_name ].replace(RegExp.content_marker, $(this).html() ).trim_empty_lines();
+					target_html = target_html.replace(RegExp.attr_marker, function(capture, attr_name) {
+						var attr_value = $initial_element.attr(attr_name);
+
+						if (typeof attr_value !== 'undefined') {
+							$initial_element.removeAttr( attr_name );
+							return attr_value;
+						} else {
+							utils.throwErr( new Error(`Attribute ${ attr_name } is empty!`) );
+						}
+					});
+
+					$transfer = $( target_html );
+
 					self.replaceAndPreserveData( $initial_element, $transfer );
 
 					/*attributes = $( this ).attr();
