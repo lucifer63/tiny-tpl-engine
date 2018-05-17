@@ -460,7 +460,15 @@ Object.assign(self, {
 
 		function scriptEvaluator( script_name ) {
 			return function(finish_script, reject_script) {
+				var old = finish_script;
+
+				finish_script = function() {
+					console.log('    - finish: ' + script_name);
+					old();
+				};
+
 				try {
+					console.log('    - start: ' + script_name);
 					eval( current_script_map.get(script_name) );
 				} catch(e) {
 					e.message = `Error occured during execution of "${ (filename ? filename + ':' : '') + script_name }" script: ${ e.message }`;

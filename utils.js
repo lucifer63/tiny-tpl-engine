@@ -82,24 +82,24 @@ Array.prototype.last = function() {
 	return this[this.length - 1];
 }
 
-String.prototype.trim_empty_lines = function() {
-	return this.replace(RegExp.empty_lines, '');
-}
-String.prototype.truncate = function(n) {
-	return (this.length > n) ? this.substr(0, n-1) + '...' : this;
-};
-String.prototype.normalizeSpaces = function() {
-	return this.replace(RegExp.spaces, ' ');
-};
+Object.assign(String.prototype, {
+	trim_empty_lines: function() {
+		return this.replace(RegExp.empty_lines, '');
+	},
+	truncate: function(n) {
+		return (this.length > n) ? this.substr(0, n-1) + '...' : this;
+	},
+	normalizeSpaces: function() {
+		return this.replace(RegExp.spaces, ' ');
+	},
+	startsWith: function( str ) {
+		return str.length > 0 && this.substring( 0, str.length ) === str;
+	},
+	endsWith: function( str ) {
+		return str.length > 0 && this.substring( this.length - str.length, this.length ) === str;
+	}
+});
 
-
-// native String.prototype.*With is very slow
-String.prototype.startsWith = function( str ) {
-	return str.length > 0 && this.substring( 0, str.length ) === str;
-}
-String.prototype.endsWith = function( str ) {
-	return str.length > 0 && this.substring( this.length - str.length, this.length ) === str;
-}
 Object.assign(self, {
 	throwErr: function(err) {
 		throw err;
