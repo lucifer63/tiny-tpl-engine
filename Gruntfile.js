@@ -10,19 +10,36 @@ module.exports = function(grunt) {
 		tpl_config				= eval('(' + tpl_config_fake_json + ')'),
 		project_config			= grunt.file.read(path + '\\Data\\configs\\config.cfg'),
 		extract_texttags		= new RegExp('textTags\\s*=\\s*(\\[.*?\\])', 'gi'),
-		inline_elements			= JSON.parse(extract_texttags.exec(project_config)[1]);
+		inline_elements			= JSON.parse(extract_texttags.exec(project_config)[1]),
+		default_inline_elements = [ "nobr", "img" ],
+		grunt_prettify_options	= {
+			condense: false,
+			indent: 1,
+			indent_char: '\t',
+			max_preserve_newlines: 1
+		};
 
-	inline_elements.push("text", "nobr");
+	if (!tpl_config.grunt_prettify_options) tpl_config.grunt_prettify_options = {};
+
+	Object.assign(grunt_prettify_options, tpl_config.grunt_prettify_options);
+	grunt_prettify_options.unformatted = [];
+
+	if (tpl_config.grunt_prettify_options.unformatted instanceof Array) {
+		if (tpl_config.grunt_prettify_options.unformatted_merge_mode === 'set') {
+			grunt_prettify_options.unformatted = tpl_config.grunt_prettify_options.unformatted;	
+		} else {
+			grunt_prettify_options.unformatted = default_inline_elements;
+			[].push.apply(grunt_prettify_options.unformatted, tpl_config.grunt_prettify_options.unformatted);
+		}
+	}
+
+	if (tpl_config.grunt_prettify_options.unformatted_include_inline !== false) {
+		[].push.apply(grunt_prettify_options.unformatted, inline_elements);
+	}
 
 	grunt.initConfig({
 		prettify: {
-			options: {
-				condense: false,
-				indent: 1,
-				indent_char: '\t',
-				max_preserve_newlines: 1,
-				unformatted: inline_elements
-			},
+			options: grunt_prettify_options,
 			all: {
 				expand: true,
 				cwd: path + '\\' + tpl_config.folders.processed,
