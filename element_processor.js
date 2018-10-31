@@ -455,49 +455,49 @@ Object.assign(self, {
 			self.applyCounters( $(elem), counters, $, lvl + 1 );
 		})
 	},
-	executeScriptsForDocument: function($, filename) {
-		var current_script_map = utils.scripts[ utils.step ];
+	async executeScriptsForDocument: function($, filename) {
+		// var current_script_map = utils.scripts[ utils.step ];
 
-		function scriptEvaluator( script_name ) {
-			return function(finish_script, reject_script) {
-				try {
-					eval( current_script_map.get(script_name) );
-				} catch(e) {
-					e.message = `Error occured during execution of "${ (filename ? filename + ':' : '') + script_name }" script: ${ e.message }`;
-					reject_script(e);
-					throw e;
-				}
-			};
-		};
+		// function scriptEvaluator( script_name ) {
+		// 	return function(finish_script, reject_script) {
+		// 		try {
+		// 			eval( current_script_map.get(script_name) );
+		// 		} catch(e) {
+		// 			e.message = `Error occured during execution of "${ (filename ? filename + ':' : '') + script_name }" script: ${ e.message }`;
+		// 			reject_script(e);
+		// 			throw e;
+		// 		}
+		// 	};
+		// };
 
-		return new Promise(function(res, rej) {
-			var i = 0,
-				scripts_array = new Array( current_script_map.size );
+		// return new Promise(function(res, rej) {
+		// 	var i = 0,
+		// 		scripts_array = new Array( current_script_map.size );
 
-			for (var filename of current_script_map.keys()) {
-				scripts_array[ i++ ] = scriptEvaluator( filename );
-			}
+		// 	for (var filename of current_script_map.keys()) {
+		// 		scripts_array[ i++ ] = scriptEvaluator( filename );
+		// 	}
 
-			ignite([ scripts_array ]).then(res);
-		});
+		// 	ignite([ scripts_array ]).then(res);
+		// });
 	},
-	executeScriptsForCurrentStep: function(finish, abort) {
-		if (utils.scripts[ utils.step ] && utils.scripts[ utils.step ].size) {
-			if (utils.step === utils.script_steps[0]) {
-				element_processor.executeScriptsForDocument().then(finish);
-			} else {
-				var i = 0,
-					document_scripts_array = new Array( utils.xml_trees.length );
+	async executeScriptsForCurrentStep: function(finish, abort) {
+		// if (utils.scripts[ utils.step ] && utils.scripts[ utils.step ].size) {
+		// 	if (utils.step === utils.script_steps[0]) {
+		// 		element_processor.executeScriptsForDocument().then(finish);
+		// 	} else {
+		// 		var i = 0,
+		// 			document_scripts_array = new Array( utils.xml_trees.length );
 
-				for (var tree in utils.xml_trees) {
-					document_scripts_array[ i++ ] = element_processor.executeScriptsForDocument(utils.xml_trees[tree], tree);
-				}
+		// 		for (var tree in utils.xml_trees) {
+		// 			document_scripts_array[ i++ ] = element_processor.executeScriptsForDocument(utils.xml_trees[tree], tree);
+		// 		}
 
-				Promise.all(document_scripts_array).then(finish);
-			}
-		} else {
-			finish();
-		}
+		// 		Promise.all(document_scripts_array).then(finish);
+		// 	}
+		// } else {
+		// 	finish();
+		// }
 	}
 });
 

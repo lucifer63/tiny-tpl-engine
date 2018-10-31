@@ -3,75 +3,75 @@
 global.utils = {};
 var self = utils;
 
-(function() {
-	global.ignite = function( fuse, system ) {
-		var end_of_the_wick, f,
-			wrapper = system ? system_function_wrapper : function_wrapper;
+// (function() {
+// 	global.ignite = function( fuse, system ) {
+// 		var end_of_the_wick, f,
+// 			wrapper = system ? system_function_wrapper : function_wrapper;
 
-		if (fuse[0] instanceof Array) {
-			end_of_the_wick = Promise.all( fuse[0].map(wrapper) );
-		} else if (typeof fuse[0] === 'object') {
-			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(wrapper) );
-		} else if (typeof fuse[0] === 'function') {
-			end_of_the_wick = wrapper(fuse[0]);
-		} else {
-			throw new Error('Array passed to ignite should only contain arrays, object or functions!');
-		}
+// 		if (fuse[0] instanceof Array) {
+// 			end_of_the_wick = Promise.all( fuse[0].map(wrapper) );
+// 		} else if (typeof fuse[0] === 'object') {
+// 			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(wrapper) );
+// 		} else if (typeof fuse[0] === 'function') {
+// 			end_of_the_wick = wrapper(fuse[0]);
+// 		} else {
+// 			throw new Error('Array passed to ignite should only contain arrays, object or functions!');
+// 		}
 
-		for (let i = 1; i < fuse.length; i++) {
-			if (fuse[i] instanceof Array) {
-				f = function() {
-					return Promise.all( fuse[i].map(wrapper) );
-				}
-			} else if (typeof fuse[i] === 'object') {
-				f = function() {
-					return Promise.all( Object.values( fuse[i] ).map(wrapper) );
-				}
-			} else if (typeof fuse[i] === 'function') {
-				f = function() {
-					return wrapper(fuse[i]);
-				}
-			} else {
-				throw new Error('Array passed to ignite should only contain arrays, object or functions!');
-			}
+// 		for (let i = 1; i < fuse.length; i++) {
+// 			if (fuse[i] instanceof Array) {
+// 				f = function() {
+// 					return Promise.all( fuse[i].map(wrapper) );
+// 				}
+// 			} else if (typeof fuse[i] === 'object') {
+// 				f = function() {
+// 					return Promise.all( Object.values( fuse[i] ).map(wrapper) );
+// 				}
+// 			} else if (typeof fuse[i] === 'function') {
+// 				f = function() {
+// 					return wrapper(fuse[i]);
+// 				}
+// 			} else {
+// 				throw new Error('Array passed to ignite should only contain arrays, object or functions!');
+// 			}
 
-			end_of_the_wick = end_of_the_wick.then(f);
-		}
+// 			end_of_the_wick = end_of_the_wick.then(f);
+// 		}
 
-		return end_of_the_wick;
-	};
+// 		return end_of_the_wick;
+// 	};
 
-	function system_function_wrapper(f) {
-		return new Promise((main_res, main_rej) => {
-			utils.step = f.name;
-			console.log(`Starting procedure "${ f.name }"`);
-			return new Promise(function(res, rej) {
-					if (utils.script_steps.indexOf(f.name) !== -1) {
-						var scripts_promise = new Promise(element_processor.executeScriptsForCurrentStep);
-					}
-					return (scripts_promise ? scripts_promise.then(() => new Promise(f)) : new Promise(f)).then(res);
-				})
-				.then(() => {
-					console.log(`Finished procedure "${ f.name }"`);
-					main_res();
-				})
-				.catch((reason) => {
-					console.log(`Procedure "${ f.name }" has failed!`);
-					main_rej(reason);
-				});
-		});
-	}
+// 	function system_function_wrapper(f) {
+// 		return new Promise((main_res, main_rej) => {
+// 			utils.step = f.name;
+// 			console.log(`Starting procedure "${ f.name }"`);
+// 			return new Promise(function(res, rej) {
+// 					if (utils.script_steps.indexOf(f.name) !== -1) {
+// 						var scripts_promise = new Promise(element_processor.executeScriptsForCurrentStep);
+// 					}
+// 					return (scripts_promise ? scripts_promise.then(() => new Promise(f)) : new Promise(f)).then(res);
+// 				})
+// 				.then(() => {
+// 					console.log(`Finished procedure "${ f.name }"`);
+// 					main_res();
+// 				})
+// 				.catch((reason) => {
+// 					console.log(`Procedure "${ f.name }" has failed!`);
+// 					main_rej(reason);
+// 				});
+// 		});
+// 	}
 
-	function function_wrapper(f) {
-		return new Promise((main_res, main_rej) => {
-			return new Promise(f)
-				.then(main_res)
-				.catch((reason) => {
-					main_rej(reason);
-				});
-		});
-	}
-})();
+// 	function function_wrapper(f) {
+// 		return new Promise((main_res, main_rej) => {
+// 			return new Promise(f)
+// 				.then(main_res)
+// 				.catch((reason) => {
+// 					main_rej(reason);
+// 				});
+// 		});
+// 	}
+// })();
 
 Object.assign(RegExp, {
 	empty_lines:		/^\s*[\r\n]/gm,
@@ -143,7 +143,7 @@ Object.assign(self, {
 		}
 	})(),
 	// dirname, file_object, callback
-	saveFiles: function(options) {
+	async saveFiles: function(options) {
 		var files_amount = Object.keys(options.file_object).length,
 			processed = 0;
 
@@ -167,7 +167,7 @@ Object.assign(self, {
 		})
 	},
 	// dirname, files, callback
-	readFiles: function(options) {
+	async readFiles: function(options) {
 		var processed = 0,
 			files = new Map();
 
@@ -197,14 +197,16 @@ Object.assign(self, {
 	},
 	// dirname, callback
 	readDir: function(options) {
-		self.fs.readdir(options.dirname, function(err, filenames) {
-			if (err) {
-				utils.throwErr(err);
-				return;
-			}
+		return new Promise(async (res, rej) => {
+			self.fs.readdir(options.dirname, function(err, filenames) {
+				if (err) {
+					throw err;
+					return;
+				}
 
-			options.files = filenames;
-			utils.readFiles(options);
+				options.files = filenames;
+				res( await utils.readFiles(options) );
+			});
 		});
 	}
 });

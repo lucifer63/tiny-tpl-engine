@@ -58,59 +58,59 @@ ignite([
 	saveFiles
 ], true);
 
-function readTemplates(finish, abort) {
+async function readTemplates() {
 	utils.log('Starting to readTemplates.')
 	var dirname = project_folder + '\\' + config.folders.templates;
 
 	if (!utils.fs.existsSync(dirname)) {
 		console.log(`There is no "${ dirname }" directory!`);
-		return finish();
+		return;
 	}
 
-	utils.readDir({
+	let files = await utils.readDir({
 		dirname: dirname,
 		callback: files => {
 			if (!files.size) {
 				console.log(`No files found in "${ dirname }" directory!`);
-				return finish();
+				return;
 			}
 			for (var filename of files.keys()) {
 				utils.templates[ filename.split('.')[0] ] = files.get(filename);
 			}
 			utils.log('Finished procedure readTemplates.');
-			return finish();
 
 		}
 	});
 }
 
-function readAndProcessXMLFiles(finish, abort) {
+async function readAndProcessXMLFiles() {
 	var dirname = project_folder + '\\' + config.folders.raw;
 
 	if (!utils.fs.existsSync(dirname)) {
-		return abort(`There is no "${ dirname }" directory!`);
+		utils.log(`There is no "${ dirname }" directory!`)
+		return;
 	}
 
 	utils.readDir({
 		dirname: dirname,
 		callback: files => {
 			if (!files.size) {
-				return abort(`No files found in "${ dirname }" directory!`);
+				utils.log(`No files found in "${ dirname }" directory!`)
+				return;
 			}
 			for (var filename of files.keys()) {
 				utils.xml_trees[ filename.split('.')[0] ] = utils.cheerio.load( files.get(filename), { xmlMode: true, decodeEntities: false });
 			}
-			return finish();
 		}
 	});
 }
 
-function readStyles(finish, abort) {
+async function readStyles() {
 	var dirname = project_folder + '\\' + config.folders.styles;
 
 	if (!utils.fs.existsSync(dirname)) {
 		console.log(`There is no "${ dirname }" directory!`);
-		return finish();
+		return;
 	}
 
 	var	extension = '.css',
@@ -119,32 +119,31 @@ function readStyles(finish, abort) {
 			callback: files => {
 				if (!files.size) {
 					console.log(`No files found in "${ dirname }" directory!`);
-					return finish();
+					return;
 				}
 				for (var filename of files.keys()) {
 					if (filename.slice(-extension.length) === extension) {
 						utils.style += files.get(filename) + '\n';
 					}
 				}
-				return finish();
 			}
 		};
 
 	if (config.paths.styles && config.paths.styles instanceof Array) {
 		config.paths.styles = config.paths.styles.map(path => path.slice( - extension.length ) === extension ? path : path + extension)
 		options.files = config.paths.styles;
-		utils.readFiles( options )
+		await utils.readFiles( options )
 	} else {
-		utils.readDir( options );
+		await utils.readDir( options );
 	}
 }
 
-function readScripts(finish, abort) {
+async function readScripts() {
 	var dirname = project_folder + '\\' + config.folders.scripts;
 
 	if (!utils.fs.existsSync(dirname)) {
 		console.log(`There is no "${ dirname }" directory!`);
-		return finish();
+		return;
 	}
 
 	var	extension = '.js',
@@ -153,10 +152,9 @@ function readScripts(finish, abort) {
 			callback: files => {
 				if (!files.size) {
 					console.log(`No files found in "${ dirname }" directory!`);
-					return finish();
+					return;
 				}
 				utils.scripts = files;
-				return finish();
 			}
 		};
 
@@ -169,7 +167,7 @@ function readScripts(finish, abort) {
 	}
 }
 
-function divideScriptsBySteps(finish, abort) {
+async function divideScriptsBySteps() {
 	var step_reg = /^\s*\/\*\s*step:\s*([a-z]*?)\s*\*\//i,
 		scripts = utils.scripts;
 
@@ -192,48 +190,42 @@ function divideScriptsBySteps(finish, abort) {
 			utils.scripts[ step ].set(filename, code);
 		});
 	}
-
-	return finish();
 }
 
-function init(finish, abort) {
+async function init() {
 	/* just a placeholder function to execute scripts bound to step:init */
-	return finish();
 }
 
-function applyTemplates(finish, abort) {
+async function applyTemplates() {
 	for (var tree in utils.xml_trees) {
 		element_processor.applyTemplates( utils.xml_trees[ tree ] );
 	}
 	delete utils.templates;
-	return finish();
 }
 
-function inlineStyles(finish, abort) {
+async function inlineStyles() {
 	for (var tree in utils.xml_trees) {
 		utils.juice.inlineDocument( utils.xml_trees[tree], utils.style);
 		element_processor.styleToAttributes( utils.xml_trees[ tree ] );
 	}
-	return finish();
 }
 
-function applyCounters(finish, abort) {
+async function applyCounters() {
 	for (var tree in utils.xml_trees) {
 		element_processor.applyCounters( utils.xml_trees[tree].root(), {}, utils.xml_trees[tree] );
 	}
-	return finish();
 }
 
-function saveFiles(finish, abort) {
+async function saveFiles() {
 	for (var tree in utils.xml_trees) {
 		utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
 	}
 
-	utils.saveFiles({
+	await utils.saveFiles({
 		dirname: project_folder + '\\' + config.folders.processed,
 		file_object: utils.xml_trees,
 		callback: () => {
-			return finish();
+			console.log('All files has been saved!');
 		}
 	});
 }
