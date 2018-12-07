@@ -24,7 +24,6 @@ utils.cheerio.prototype.eachTextNode = function(processor, callback) {
 }
 
 Object.assign(self, {
-	temp: null,
 	replaceAndPreserveData: function($source, $transfer) {
 		$source.replaceWith($transfer);
 
@@ -46,8 +45,8 @@ Object.assign(self, {
 		while (unprocessed_elements_exist) {
 			unprocessed_elements_exist = false;
 
-			for (var tag_name in utils.templates) { 
-				$elements = $( tag_name ); 
+			for (var tag_name in utils.templates) {
+				$elements = $( tag_name );
 
 				if ($elements.length) {
 					unprocessed_elements_exist = true;
@@ -82,7 +81,7 @@ Object.assign(self, {
 					$transfer.data( $initial_element.data() );*/
 
 					$transfer.find('if').each(function(i, elem) {
-						var $if = $( elem ), 
+						var $if = $( elem ),
 						condition = $if.attr('condition');
 
 						try {
@@ -97,7 +96,7 @@ Object.assign(self, {
 					})
 
 					$transfer.find('[condition]').each(function(i, elem) {
-						var $this = $( elem ), 
+						var $this = $( elem ),
 							condition = $this.attr('condition');
 
 						try {
@@ -111,7 +110,7 @@ Object.assign(self, {
 						}
 					})
 				});
-			} 
+			}
 		}
 	},
 	styleToAttributes: function( $ ) {
@@ -212,7 +211,7 @@ Object.assign(self, {
 						break;
 					} else {
 						index--;
-					}	
+					}
 				}
 
 				output += counter[index].last();
@@ -265,14 +264,14 @@ Object.assign(self, {
 				if (index_of_first_space !== -1) {
 					counter_reset[i] = [ counter_reset[i].substr(0, index_of_first_space), counter_reset[i].substr(index_of_first_space + 1).trim() ];
 				}
-				
+
 				if (typeof counter_reset[i] === 'string') {
 					name = counter_reset[i];
 					value = 0;
 				} else {
 					name = counter_reset[i][0];
 					value = self.parseCSSFunctionStringAs( 'value', counter_reset[i][1] );
-					value = self.parseValue( value, node, counters, $ );	
+					value = self.parseValue( value, node, counters, $ );
 				}
 
 				/* processing counter s */
@@ -308,7 +307,7 @@ Object.assign(self, {
 				if (index_of_first_space !== -1) {
 					counter_increment[i] = [ counter_increment[i].substr(0, index_of_first_space), counter_increment[i].substr(index_of_first_space + 1).trim() ];
 				}
-				
+
 				if (typeof counter_increment[i] === 'string') {
 					name = counter_increment[i];
 					if (name === 'none') {
@@ -335,7 +334,7 @@ Object.assign(self, {
 						break;
 					} else {
 						index--;
-					}	
+					}
 				}
 
 				if (value === 0) {
@@ -362,11 +361,11 @@ Object.assign(self, {
 				index_of_first_space = modify_attribute[i].indexOf(' ');
 
 				if (index_of_first_space === -1) {
-					throw new Error(`CSS value "${modify_attribute[i]}" is invalid: modify-attribute rule must consist of two parts!`);	
+					throw new Error(`CSS value "${modify_attribute[i]}" is invalid: modify-attribute rule must consist of two parts!`);
 				}
 
 				modify_attribute[i] = [ modify_attribute[i].substr(0, index_of_first_space), modify_attribute[i].substr(index_of_first_space + 1).trim() ];
-				
+
 				name = modify_attribute[i][0];
 
 				value = self.parseCSSFunctionStringAs( 'value', modify_attribute[i][1] );
@@ -386,7 +385,7 @@ Object.assign(self, {
 		if (modify_content) {
 			modify_content = modify_content.trim();
 
-			value = self.parseValue( modify_content, node, counters, $ );			
+			value = self.parseValue( modify_content, node, counters, $ );
 
 			node.html(value);
 			node.removeAttr('modify-content');
@@ -455,49 +454,40 @@ Object.assign(self, {
 			self.applyCounters( $(elem), counters, $, lvl + 1 );
 		})
 	},
-	async executeScriptsForDocument: function($, filename) {
-		// var current_script_map = utils.scripts[ utils.step ];
+	executeScriptsForDocument: async function($, filename) {
+		let current_script_map = utils.scripts[ utils.step ],
+			scripts_array = [];
 
-		// function scriptEvaluator( script_name ) {
-		// 	return function(finish_script, reject_script) {
-		// 		try {
-		// 			eval( current_script_map.get(script_name) );
-		// 		} catch(e) {
-		// 			e.message = `Error occured during execution of "${ (filename ? filename + ':' : '') + script_name }" script: ${ e.message }`;
-		// 			reject_script(e);
-		// 			throw e;
-		// 		}
-		// 	};
-		// };
+		for (let filename of current_script_map.keys()) {
+			scripts_array.push( scriptEvaluator( filename ) );
+		}
 
-		// return new Promise(function(res, rej) {
-		// 	var i = 0,
-		// 		scripts_array = new Array( current_script_map.size );
+		await ignite([ scripts_array ]);
 
-		// 	for (var filename of current_script_map.keys()) {
-		// 		scripts_array[ i++ ] = scriptEvaluator( filename );
-		// 	}
-
-		// 	ignite([ scripts_array ]).then(res);
-		// });
+		function scriptEvaluator( script_name ) {
+			return function() {
+				return new Promise((finish_script, reject_script) => {
+					try {
+						eval( current_script_map.get(script_name) );
+					} catch(e) {
+						e.message = `Error occured during execution of "${ (filename ? filename + ':' : '') + script_name }" script: ${ e.message }`;
+						reject_script(e);
+						throw e;
+					}				
+				});	
+			}
+		};
 	},
-	async executeScriptsForCurrentStep: function(finish, abort) {
-		// if (utils.scripts[ utils.step ] && utils.scripts[ utils.step ].size) {
-		// 	if (utils.step === utils.script_steps[0]) {
-		// 		element_processor.executeScriptsForDocument().then(finish);
-		// 	} else {
-		// 		var i = 0,
-		// 			document_scripts_array = new Array( utils.xml_trees.length );
-
-		// 		for (var tree in utils.xml_trees) {
-		// 			document_scripts_array[ i++ ] = element_processor.executeScriptsForDocument(utils.xml_trees[tree], tree);
-		// 		}
-
-		// 		Promise.all(document_scripts_array).then(finish);
-		// 	}
-		// } else {
-		// 	finish();
-		// }
+	executeScriptsForCurrentStep: async function(finish, abort) {
+		if (utils.scripts[ utils.step ] && utils.scripts[ utils.step ].size) {
+			if (utils.step === utils.script_steps[0]) {
+				await element_processor.executeScriptsForDocument();
+			} else {
+				for (let tree_name of Object.keys(utils.xml_trees)) {
+					await element_processor.executeScriptsForDocument(utils.xml_trees[tree_name], tree_name);
+				}
+			}
+		}
 	}
 });
 

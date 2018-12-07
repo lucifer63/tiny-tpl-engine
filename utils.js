@@ -3,107 +3,71 @@
 global.utils = {};
 var self = utils;
 
-// (function() {
-// 	global.ignite = function( fuse, system ) {
-// 		var end_of_the_wick, f,
-// 			wrapper = system ? system_function_wrapper : function_wrapper;
+(function() {
+	global.ignite = async function( fuse, system ) {
+		for (let procedure of fuse) {
+			if (system) {
+				if (procedure instanceof Array) {
+					await Promise.all(procedure.map(f => system_function_wrapper(f)));
+				} else {
+					await system_function_wrapper(procedure);
+				}	
+			} else {
+				if (procedure instanceof Array) {
+					await Promise.all(procedure.map(f => f()));
+				} else {
+					await procedure();
+				}
+			}
+		}
+	}
 
-// 		if (fuse[0] instanceof Array) {
-// 			end_of_the_wick = Promise.all( fuse[0].map(wrapper) );
-// 		} else if (typeof fuse[0] === 'object') {
-// 			end_of_the_wick = Promise.all( Object.values( fuse[0] ).map(wrapper) );
-// 		} else if (typeof fuse[0] === 'function') {
-// 			end_of_the_wick = wrapper(fuse[0]);
-// 		} else {
-// 			throw new Error('Array passed to ignite should only contain arrays, object or functions!');
-// 		}
-
-// 		for (let i = 1; i < fuse.length; i++) {
-// 			if (fuse[i] instanceof Array) {
-// 				f = function() {
-// 					return Promise.all( fuse[i].map(wrapper) );
-// 				}
-// 			} else if (typeof fuse[i] === 'object') {
-// 				f = function() {
-// 					return Promise.all( Object.values( fuse[i] ).map(wrapper) );
-// 				}
-// 			} else if (typeof fuse[i] === 'function') {
-// 				f = function() {
-// 					return wrapper(fuse[i]);
-// 				}
-// 			} else {
-// 				throw new Error('Array passed to ignite should only contain arrays, object or functions!');
-// 			}
-
-// 			end_of_the_wick = end_of_the_wick.then(f);
-// 		}
-
-// 		return end_of_the_wick;
-// 	};
-
-// 	function system_function_wrapper(f) {
-// 		return new Promise((main_res, main_rej) => {
-// 			utils.step = f.name;
-// 			console.log(`Starting procedure "${ f.name }"`);
-// 			return new Promise(function(res, rej) {
-// 					if (utils.script_steps.indexOf(f.name) !== -1) {
-// 						var scripts_promise = new Promise(element_processor.executeScriptsForCurrentStep);
-// 					}
-// 					return (scripts_promise ? scripts_promise.then(() => new Promise(f)) : new Promise(f)).then(res);
-// 				})
-// 				.then(() => {
-// 					console.log(`Finished procedure "${ f.name }"`);
-// 					main_res();
-// 				})
-// 				.catch((reason) => {
-// 					console.log(`Procedure "${ f.name }" has failed!`);
-// 					main_rej(reason);
-// 				});
-// 		});
-// 	}
-
-// 	function function_wrapper(f) {
-// 		return new Promise((main_res, main_rej) => {
-// 			return new Promise(f)
-// 				.then(main_res)
-// 				.catch((reason) => {
-// 					main_rej(reason);
-// 				});
-// 		});
-// 	}
-// })();
+	async function system_function_wrapper(f) {
+		utils.step = f.name;
+		console.log(`Starting procedure "${ f.name }"`);
+		try {
+			if (utils.script_steps.indexOf(f.name) !== -1) {
+				await element_processor.executeScriptsForCurrentStep();
+			}
+			await f();
+		} catch (e) {
+			console.log(`Procedure "${ f.name }" has failed!`);
+			throw e;
+		}
+		console.log(`Finished procedure "${ f.name }"`);
+	}
+})();
 
 Object.assign(RegExp, {
 	empty_lines:		/^\s*[\r\n]/gm,
 	spaces:				/\s+/g
 });
 
-Array.prototype.last = function() {
-	return this[this.length - 1];
-}
+Object.assign(Array.prototype, {
+	last: function() {
+		return this[this.length - 1];
+	}
+});
 
-String.prototype.trim_empty_lines = function() {
-	return this.replace(RegExp.empty_lines, '');
-}
-String.prototype.truncate = function(n) {
-	return (this.length > n) ? this.substr(0, n-1) + '...' : this;
-};
-String.prototype.normalizeSpaces = function() {
-	return this.replace(RegExp.spaces, ' ');
-};
-
-
-// native String.prototype.*With is very slow
-String.prototype.startsWith = function( str ) {
-	return str.length > 0 && this.substring( 0, str.length ) === str;
-}
-String.prototype.endsWith = function( str ) {
-	return str.length > 0 && this.substring( this.length - str.length, this.length ) === str;
-}
-Object.assign(self, {
-	throwErr: function(err) {
-		throw err;
+Object.assign(String.prototype, {
+	startsWith: function( str ) {
+		return str.length > 0 && this.substring( 0, str.length ) === str;
 	},
+	endsWith: function( str ) {
+		return str.length > 0 && this.substring( this.length - str.length, this.length ) === str;
+	},
+	trim_empty_lines: function() {
+		return this.replace(RegExp.empty_lines, '');
+	},
+	truncate: function(n) {
+		return (this.length > n) ? this.substr(0, n-1) + '...' : this;
+	},
+	normalizeSpaces: function() {
+		return this.replace(RegExp.spaces, ' ');
+	}
+});
+
+Object.assign(self, {
 	log: (function() {
 		var styles = {
 			reset: 0,
@@ -142,71 +106,53 @@ Object.assign(self, {
 			return false;
 		}
 	})(),
-	// dirname, file_object, callback
-	async saveFiles: function(options) {
-		var files_amount = Object.keys(options.file_object).length,
-			processed = 0;
-
-		utils.mkdirp(options.dirname, function(err) {
-			if (err) {
-				utils.throwErr(err);
-				return;
-			}
-			for (var filename in options.file_object) {
-				self.fs.writeFile(options.dirname + '\\' + filename + '.xml', options.file_object[ filename ], function(err) {
-					if (err) {
-						utils.throwErr(err);
-						return;
-					}
-					processed++;
-					if (files_amount === processed && typeof options.callback === 'function') {
-						options.callback();
-					}
-				});
-			}
-		})
-	},
-	// dirname, files, callback
-	async readFiles: function(options) {
-		var processed = 0,
-			files = new Map();
-
-		if (options.files.length) {
-			options.files.forEach(function(filename, i) {
-				files.set(filename, i);
-				self.fs.readFile(options.dirname + '\\' + filename, 'utf-8', function(err, content) {
-					if (err) {
-						utils.throwErr(err);
-						return;
-					}
-
-					files.set(filename, content);
-
-					processed++;
-
-					if (options.files.length === processed && typeof options.callback === 'function') {
-						options.callback( files );
-					}
-				});
-			});
-		} else {
-			if (typeof options.callback === 'function') {
-				options.callback( files );
-			}
-		}
-	},
-	// dirname, callback
-	readDir: function(options) {
-		return new Promise(async (res, rej) => {
-			self.fs.readdir(options.dirname, function(err, filenames) {
+	readFile: function(path) {
+		return new Promise((res, rej) => {
+			self.fs.readFile(path, 'utf-8', function(err, content) {
 				if (err) {
-					throw err;
-					return;
+					return rej( err );
 				}
 
-				options.files = filenames;
-				res( await utils.readFiles(options) );
+				res( content );
 			});
 		});
+	},
+	saveFile: function(path, content) {
+		return new Promise((res, rej) => {
+			self.fs.writeFile(path, content, 'utf-8', function(err) {
+				if (err) {
+					return rej( err );
+				}
+
+				res( content )
+			});
+		});
+	},
+	readFiles: async function(dirname, filenames) {
+		var files = new Map();
+
+		for (let filename of filenames) {
+			files.set(filename, await self.readFile(dirname + '\\' + filename));
+		}
+
+		return files;
+	},
+	readDir: function(dirname) {
+		return new Promise((res, rej) => {
+			self.fs.readdir(dirname, async (err, filenames) => {
+				if (err) {
+					return rej( err );
+				}
+
+				res( self.readFiles(dirname, filenames) );
+			});
+		});
+	},
+	saveFiles: async function(dirname, file_object, ext) {
+		file_object = Object.entries(file_object);
+
+		for (let [filename, content] of file_object) {
+			await self.saveFile(dirname + '\\' + filename + (ext && '.' + ext), content);
+		}
 	}
 });

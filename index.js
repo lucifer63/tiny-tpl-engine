@@ -59,112 +59,93 @@ ignite([
 ], true);
 
 async function readTemplates() {
-	utils.log('Starting to readTemplates.')
-	var dirname = project_folder + '\\' + config.folders.templates;
+	let dirname = project_folder + '\\' + config.folders.templates;
 
 	if (!utils.fs.existsSync(dirname)) {
 		console.log(`There is no "${ dirname }" directory!`);
 		return;
 	}
 
-	let files = await utils.readDir({
-		dirname: dirname,
-		callback: files => {
-			if (!files.size) {
-				console.log(`No files found in "${ dirname }" directory!`);
-				return;
-			}
-			for (var filename of files.keys()) {
-				utils.templates[ filename.split('.')[0] ] = files.get(filename);
-			}
-			utils.log('Finished procedure readTemplates.');
+	let files = await utils.readDir(dirname);
 
-		}
-	});
+	if (!files.size) {
+		console.log(`No files found in "${ dirname }" directory!`);
+		return;
+	}
+	for (let filename of files.keys()) {
+		utils.templates[ filename.split('.')[0] ] = files.get(filename);
+	}
 }
 
 async function readAndProcessXMLFiles() {
-	var dirname = project_folder + '\\' + config.folders.raw;
+	let dirname = project_folder + '\\' + config.folders.raw;
 
 	if (!utils.fs.existsSync(dirname)) {
 		utils.log(`There is no "${ dirname }" directory!`)
 		return;
 	}
 
-	utils.readDir({
-		dirname: dirname,
-		callback: files => {
-			if (!files.size) {
-				utils.log(`No files found in "${ dirname }" directory!`)
-				return;
-			}
-			for (var filename of files.keys()) {
-				utils.xml_trees[ filename.split('.')[0] ] = utils.cheerio.load( files.get(filename), { xmlMode: true, decodeEntities: false });
-			}
-		}
-	});
+	let files = await utils.readDir(dirname);
+
+	if (!files.size) {
+		utils.log(`No files found in "${ dirname }" directory!`)
+		return;
+	}
+	for (let filename of files.keys()) {
+		utils.xml_trees[ filename.split('.')[0] ] = utils.cheerio.load( files.get(filename), { xmlMode: true, decodeEntities: false });
+	}
 }
 
 async function readStyles() {
-	var dirname = project_folder + '\\' + config.folders.styles;
+	let dirname = project_folder + '\\' + config.folders.styles;
 
 	if (!utils.fs.existsSync(dirname)) {
-		console.log(`There is no "${ dirname }" directory!`);
+		utils.log(`There is no "${ dirname }" directory!`)
 		return;
 	}
 
-	var	extension = '.css',
-		options = {
-			dirname: dirname,
-			callback: files => {
-				if (!files.size) {
-					console.log(`No files found in "${ dirname }" directory!`);
-					return;
-				}
-				for (var filename of files.keys()) {
-					if (filename.slice(-extension.length) === extension) {
-						utils.style += files.get(filename) + '\n';
-					}
-				}
-			}
-		};
+	let files,
+		extension = '.css';
 
 	if (config.paths.styles && config.paths.styles instanceof Array) {
 		config.paths.styles = config.paths.styles.map(path => path.slice( - extension.length ) === extension ? path : path + extension)
-		options.files = config.paths.styles;
-		await utils.readFiles( options )
+		files = await utils.readFiles( dirname, config.paths.styles )
 	} else {
-		await utils.readDir( options );
+		files = await utils.readDir( dirname );
+	}
+	if (!files.size) {
+		utils.log(`No files found in "${ dirname }" directory!`)
+		return;
+	}
+	for (let filename of files.keys()) {
+		if (filename.slice(-extension.length) === extension) {
+			utils.style += files.get(filename) + '\n';
+		}
 	}
 }
 
 async function readScripts() {
-	var dirname = project_folder + '\\' + config.folders.scripts;
+	let dirname = project_folder + '\\' + config.folders.scripts;
 
 	if (!utils.fs.existsSync(dirname)) {
 		console.log(`There is no "${ dirname }" directory!`);
 		return;
 	}
 
-	var	extension = '.js',
-		options = {
-			dirname: dirname,
-			callback: files => {
-				if (!files.size) {
-					console.log(`No files found in "${ dirname }" directory!`);
-					return;
-				}
-				utils.scripts = files;
-			}
-		};
+	let files,
+		extension = '.js';
 
 	if (config.paths.scripts && config.paths.scripts instanceof Array) {
 		config.paths.scripts = config.paths.scripts.map(path => path.slice( - extension.length ) === extension ? path : path + extension)
-		options.files = config.paths.scripts;
-		utils.readFiles( options )
+		files = await utils.readFiles( dirname, config.paths.scripts )
 	} else {
-		utils.readDir( options );
+		files = await utils.readDir( dirname );
 	}
+	if (!files.size) {
+		console.log(`No files found in "${ dirname }" directory!`);
+		return;
+	}
+	utils.scripts = files;
 }
 
 async function divideScriptsBySteps() {
@@ -221,11 +202,5 @@ async function saveFiles() {
 		utils.xml_trees[ tree ] = utils.xml_trees[ tree ].html();
 	}
 
-	await utils.saveFiles({
-		dirname: project_folder + '\\' + config.folders.processed,
-		file_object: utils.xml_trees,
-		callback: () => {
-			console.log('All files has been saved!');
-		}
-	});
+	await utils.saveFiles(project_folder + '\\' + config.folders.processed, utils.xml_trees, 'xml');
 }
